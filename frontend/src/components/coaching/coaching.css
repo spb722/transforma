@@ -45,33 +45,35 @@
 .coaching-header h1{font-size:clamp(30px,4vw,46px);line-height:1;letter-spacing:-.04em;color:var(--label)}
 .coaching-main .btn{color:var(--label);border:var(--hair) solid var(--coach-border);background:var(--surface)}
 .coaching-main .btn.primary,.join-page .btn.primary{background:var(--trainer-fill);border-color:var(--trainer-fill);color:var(--trainer-on-fill)}
+/* Blockprint direction: a flat fill with no border, not a bordered card — same
+   language as `.bcell`/`.trainer-block` on the personal side (research.md §1a). */
 .coaching-banner,.coaching-hero{
-  display:flex;align-items:center;justify-content:space-between;gap:20px;border-radius:var(--r-lg);
-  padding:22px 24px;margin-bottom:22px;background:color-mix(in srgb, var(--trainer-text) 16%, var(--surface));
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding:22px 24px;margin-bottom:22px;background:var(--surface);
 }
 .coaching-banner strong{font-size:17px}
 .coaching-banner p,.coaching-hero p,.coaching-panel p{color:var(--label-2);margin-top:5px;font-size:14px;line-height:1.5}
 .coaching-hero{padding:30px;background:var(--trainer-fill);color:var(--trainer-on-fill)}
-.coaching-hero span{color:var(--trainer-on-fill);font-size:12px;text-transform:uppercase;letter-spacing:.12em;font-weight:700;opacity:.85}
+.coaching-hero span{color:var(--trainer-on-fill);font-size:12px;text-transform:uppercase;letter-spacing:.12em;font-weight:800;opacity:.92}
 .coaching-hero h2{font-size:26px;margin-top:8px}
 .coaching-hero p{color:var(--trainer-on-fill);opacity:.8;max-width:560px}
-.coaching-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:22px}
-.coaching-stat-grid article{background:var(--surface);border:var(--hair) solid var(--coach-border);border-radius:var(--r-lg);padding:20px}
-.coaching-stat-grid span{display:block;color:var(--label-2);font-size:12px;font-weight:600}
-.coaching-stat-grid strong{display:block;font-size:28px;margin-top:8px;letter-spacing:-.035em}
+.coaching-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;margin-bottom:2px}
+.coaching-stat-grid article{background:var(--surface);padding:20px}
+.coaching-stat-grid span{display:block;color:var(--label-3);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.coaching-stat-grid strong{display:block;font-size:28px;font-weight:800;margin-top:8px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .coaching-stat-grid .coaching-small-value{font-size:15px;line-height:1.4;overflow-wrap:anywhere}
-.coaching-panel{background:var(--surface);border:var(--hair) solid var(--coach-border);border-radius:var(--r-lg);padding:24px;margin-bottom:18px}
+.coaching-panel{background:var(--surface);padding:24px;margin-bottom:18px}
 .coaching-panel h2{font-size:18px}
 .coaching-panel-head{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:18px}
 .coaching-search{
-  width:min(270px,44%);height:42px;border:var(--hair) solid var(--coach-border);border-radius:var(--r);
+  width:min(270px,44%);height:42px;border-radius:var(--r);
   display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--label-2);background:var(--surface-2);
 }
 .coaching-search input{width:100%;border:0;background:transparent;color:var(--label);outline:0;font-size:14px}
-.coaching-client-list{border-top:var(--hair) solid var(--coach-border)}
+.coaching-client-list{display:flex;flex-direction:column;gap:2px}
 .coaching-client-list>button,.coaching-invite-row{
   width:100%;min-height:68px;display:flex;align-items:center;gap:12px;text-align:left;
-  border-bottom:var(--hair) solid var(--coach-border);padding:10px 4px;
+  background:var(--surface);padding:10px 14px;
 }
 .coaching-client-list>button>span:nth-child(2),.coaching-invite-row>span{flex:1}
 .coaching-client-list strong,.coaching-invite-row strong{display:block;text-transform:capitalize}
@@ -83,7 +85,7 @@
 .coaching-empty{text-align:center;padding:34px;color:var(--label-2)}
 .coaching-empty>.icn{font-size:38px;margin:0 auto 10px;color:var(--label-3)}
 .coaching-empty h3{color:var(--label);margin-bottom:5px}
-.coaching-section-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.coaching-section-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px}
 .coaching-section-grid .coaching-panel{min-height:130px}
 .coaching-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .coaching-danger{margin-top:24px}

@@ -43,7 +43,7 @@ function MuscleBalance({ S }) {
 
   return <div className="bcell">
     <div className="row between" style={{ marginBottom: 8 }}>
-      <div className="eyebrow">{t('Muscle balance')} · {on ? t('by hard sets') : t('by sets worked')}</div>
+      <h2 className="eyebrow">{t('Muscle balance')} · {on ? t('by hard sets') : t('by sets worked')}</h2>
       {rated && <Button size="sm" icon="flame" style={on ? { color: 'var(--yellow)' } : undefined}
         onClick={() => { setHard(h => !h); setSel(null) }}>{on ? t('Hard') : t('All')}</Button>}
     </div>
@@ -94,7 +94,7 @@ function EffortCard({ S }) {
   const binLabel = b => kind === 'rpe' ? (b.tail ? '≤ 6' : String(10 - b.rir)) : (b.tail ? b.rir + '+' : String(b.rir))
 
   return <div className="bcell">
-    <div className="eyebrow" style={{ marginBottom: 8 }}>{t('Effort')} · {t('how close to failure')}</div>
+    <h2 className="eyebrow" style={{ marginBottom: 8 }}>{t('Effort')} · {t('how close to failure')}</h2>
     <Segmented className="seg-range" value={win} onChange={setWin}
       options={[{ value: 30, label: '30d' }, { value: 90, label: '90d' }, { value: 365, label: '1Y' }, { value: 0, label: t('All') }]} />
     {sum.rated === 0 ? <div className="muted small">{t('No rated sets in this period.')}</div> : <>
@@ -212,7 +212,7 @@ export default function Stats() {
     </div>
 
     <div className="bcell" style={{ marginTop: 2 }}>
-      <div className="eyebrow" style={{ marginBottom: 8 }}>{t('Activity — last 12 months')} · {t('by time trained')}</div>
+      <h2 className="eyebrow" style={{ marginBottom: 8 }}>{t('Activity — last 12 months')} · {t('by time trained')}</h2>
       <Heatmap S={S} onDay={iso => { const ws = S.workouts.filter(w => w.d === iso); if (ws.length === 1) workoutDetailSheet(ws[0]); else if (ws.length) calendarSheet(iso) }} />
     </div>
 
@@ -222,7 +222,7 @@ export default function Stats() {
     <div className="cols" style={{ marginTop: 22 }}>
       <div className="bcell">
         <div className="row between" style={{ marginBottom: 8 }}>
-          <div className="eyebrow">{t('Body weight')}</div>
+          <h2 className="eyebrow">{t('Body weight')}</h2>
           <div className="row" style={{ gap: 8 }}>
             <Button size="sm" icon="target" style={S.targetW ? { color: 'var(--yellow)' } : undefined} onClick={goalSheet}>{S.targetW ? fmtNum(S.targetW) : t('Goal')}</Button>
             <Button size="sm" icon="plus" onClick={() => bwSheet()}>{t('Log')}</Button>
@@ -234,7 +234,7 @@ export default function Stats() {
       </div>
 
       <div className="bcell">
-        <div className="eyebrow" style={{ marginBottom: 8 }}>{t('Exercise progress')}</div>
+        <h2 className="eyebrow" style={{ marginBottom: 8 }}>{t('Exercise progress')}</h2>
         {exHist.length ? <>
           <div className="sect-b" style={{ marginBottom: 10 }}>
             <SelectRow title={t('Exercise')} sheetTitle={t('Exercise progress')} value={curEx} onChange={setExId}
@@ -264,7 +264,7 @@ export default function Stats() {
 
     {S.workouts.length > 0 && <div style={{ marginTop: 22 }}>
       <div className="row between" style={{ marginBottom: 10 }}>
-        <div className="eyebrow">{t('Recent workouts')}</div>
+        <h4 className="eyebrow">{t('Recent workouts')}</h4>
         <Button size="sm" variant="ghost" trailingIcon="chevronRight" onClick={() => nav('/history')}>{t('All')} {S.workouts.length}</Button>
       </div>
       <div className="list">{[...S.workouts].reverse().slice(0, 6).map(w => <WorkoutRow key={w.id} w={w} onClick={() => workoutDetailSheet(w)} />)}</div>

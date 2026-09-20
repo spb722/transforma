@@ -213,7 +213,7 @@ export default function Home() {
 
     <div className="bcell" style={{ marginTop: 2 }}>
       <div className="row between" style={{ marginBottom: 6 }}>
-        <div className="eyebrow"><Icon name="scale" />{t('Body weight')}</div>
+        <h2 className="eyebrow"><Icon name="scale" />{t('Body weight')}</h2>
         <div className="row" style={{ gap: 16 }}>
           <button className="tag acc" style={S.targetW ? { color: 'var(--yellow)' } : undefined} onClick={goalSheet}>{S.targetW ? fmtNum(S.targetW) : t('Goal')}</button>
           <button className="tag acc" onClick={() => bwSheet()}><Icon name="plus" />{t('Log')}</button>

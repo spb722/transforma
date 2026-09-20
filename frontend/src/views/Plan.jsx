@@ -40,7 +40,7 @@ export default function Plan() {
       </div>}
     />
     {coachPlanActive ? <CoachAssignedPlan workspace={ownWorkspace} assigned={assigned} /> : <>
-      <div className="eyebrow" style={{ margin: '22px 0 2px' }}>{t('Week schedule')}</div>
+      <h4 className="eyebrow" style={{ margin: '22px 0 2px' }}>{t('Week schedule')}</h4>
       <div className="blocklist">
         {[1, 2, 3, 4, 5, 6, 0].map(d => {
           const r = S.routines.find(x => x.id === S.week[d])
@@ -52,7 +52,7 @@ export default function Plan() {
       </div>
 
       <div className="row between" style={{ marginTop: 22, marginBottom: 2 }}>
-        <div className="eyebrow">{t('Routines')}</div>
+        <h4 className="eyebrow">{t('Routines')}</h4>
         <Button size="sm" variant="tinted" icon="plus" onClick={addRoutine}>{t('New')}</Button>
       </div>
       {S.routines.length ? <div className="blocklist">{S.routines.map(r => <button key={r.id} className="row between" style={{ width: '100%', textAlign: 'left' }} onClick={() => nav('/plan/r/' + r.id)}>
@@ -89,7 +89,7 @@ function CoachAssignedPlan({ workspace, assigned }) {
       </div>
     </div>
 
-    <div className="eyebrow" style={{ margin: '22px 0 2px' }}>{t('Training plan')}</div>
+    <h4 className="eyebrow" style={{ margin: '22px 0 2px' }}>{t('Training plan')}</h4>
     {plan.days.map((day, i) => {
       // "All sets rest Xs" only if every timed/reps exercise in the day actually
       // agrees on X — a real plan's rest periods vary far more than the design's
@@ -117,7 +117,7 @@ function CoachAssignedPlan({ workspace, assigned }) {
       </div>
     })}
 
-    <div className="eyebrow" style={{ margin: '22px 0 2px' }}>{t('Coach schedule')}</div>
+    <h4 className="eyebrow" style={{ margin: '22px 0 2px' }}>{t('Coach schedule')}</h4>
     {assigned.upcoming.length ? <div className="blocklist">{assigned.upcoming.slice(0, 12).map(item => {
       const label = item.state === 'started' ? t('In progress')
         : item.customized && item.overrideDate ? t('Customized · Rescheduled')
@@ -133,7 +133,7 @@ function CoachAssignedPlan({ workspace, assigned }) {
       </div>
     })}</div> : <div className="bcell"><EmptyState icon="calendar" description={t('No upcoming workouts are scheduled.')} /></div>}
     {assigned.canceled.length > 0 && <>
-      <div className="eyebrow" style={{ margin: '22px 0 2px' }}>{t('Days off')}</div>
+      <h4 className="eyebrow" style={{ margin: '22px 0 2px' }}>{t('Days off')}</h4>
       <div className="blocklist">{assigned.canceled.slice(0, 12).map(item => <div className="row between" key={item.id}>
         <div className="grow"><div className="tt">{item.prescription.dayName}</div><div className="ss">{fmtCoachDate(item.scheduledDate)} · {workspace.relationship.timeZone}</div></div>
         <StatusBadge status="day-off" label={t('Day off')} />

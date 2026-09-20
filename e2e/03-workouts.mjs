@@ -52,7 +52,7 @@ try {
   ok('Personal Home shows the coach assignment', await client.page.getByText('Coach Squat Day', { exact: false }).first().isVisible());
   ok('coached Home hides personal plan creation and overlap', await client.page.getByText('Build my own plan', { exact: true }).count() === 0 && await client.page.getByText('My personal plan', { exact: true }).count() === 0);
   await client.page.getByRole('button', { name: 'Next week' }).click();
-  const selectedWeekCard = client.page.locator('.today-row').first();
+  const selectedWeekCard = client.page.locator('.trainer-block').first();
   const selectedWeekText = await selectedWeekCard.textContent();
   ok('week navigation selects and displays that week’s coach workout', selectedWeekText.includes('Coach Squat Day') && selectedWeekText.includes('Coach assigned'), selectedWeekText);
   await client.page.getByRole('button', { name: 'Previous week' }).click();
