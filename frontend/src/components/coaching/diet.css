@@ -1,0 +1,10 @@
+/* Diet assignment/editor — migrated onto the shared tokens; see coaching.css's
+   header comment for why. */
+.coaching-editor textarea{min-height:90px;border:var(--hair) solid var(--coach-border);border-radius:var(--r);padding:10px;background:var(--surface-2);color:var(--label);resize:vertical}
+.coaching-diet-item{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.coaching-food{display:flex;justify-content:space-between;gap:15px;padding:12px 0;border-bottom:var(--hair) solid var(--coach-border)}
+.coaching-food span{color:var(--label-2)}
+
+@media(max-width:520px){
+  .coaching-diet-item{grid-template-columns:1fr}
+}

@@ -1,0 +1,19 @@
+/* Fee management/viewing — migrated onto the shared tokens; see coaching.css's
+   header comment for why. Fees.jsx now renders fee status via the shared
+   <StatusBadge> (Phase 5) — the old .coaching-status class it used is gone,
+   no other view referenced it. */
+.coaching-fee-dates{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.coaching-fees{display:grid;gap:12px;margin-top:16px}
+.coaching-fees article{padding:18px;border:var(--hair) solid var(--coach-border);border-radius:var(--r-lg);display:grid;grid-template-columns:1fr auto;gap:15px}
+.coaching-fees h3{font-size:24px;margin-top:7px}
+.coaching-fees small{color:var(--label-2)}
+.coaching-fees details{grid-column:1/-1}
+.coaching-fees summary{font-size:12px;color:var(--label-2)}
+
+@media(max-width:600px){
+  .coaching-fee-dates{grid-template-columns:1fr}
+  .coaching-fees article{grid-template-columns:1fr}
+}
+@media(min-width:1440px){
+  .coaching-fees{grid-template-columns:repeat(2,minmax(0,1fr))}
+}

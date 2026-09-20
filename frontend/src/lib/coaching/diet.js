@@ -1,0 +1,2 @@
+export const newDiet=()=>({name:'Client diet',notes:'',meals:[{id:crypto.randomUUID(),name:'Breakfast',notes:'',items:[{name:'',portion:'',notes:''}]}]});
+export function normalizeDiet(value){return{name:String(value.name||'Diet plan').trim(),notes:String(value.notes||'').trim(),meals:(value.meals||[]).map(meal=>({id:meal.id,name:String(meal.name||'').trim(),notes:String(meal.notes||'').trim(),items:(meal.items||[]).map(item=>({name:String(item.name||'').trim(),portion:String(item.portion||'').trim(),notes:String(item.notes||'').trim()}))}))}}

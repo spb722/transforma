@@ -1,0 +1,17 @@
+**/node_modules
+frontend/dist
+dist
+build
+media
+data
+.env
+.env*
+!.env.example
+.git
+*.log
+*.log*
+coverage
+Dockerfile*
+.dockerignore
+.idea
+.vscode

@@ -1,0 +1,171 @@
+/* Coaching shell — migrated onto the shared design tokens (specs/002-
+   responsive-ui-redesign/). Previously this ran its own fixed light-page /
+   dark-sidebar palette, independent of the personal app's dark/light theme
+   switch — that split was the concrete "two products" problem this feature
+   exists to fix. Now the whole coaching surface follows the same --bg/
+   --surface/--label/--sep tokens (and switches with the same data-theme
+   attribute) as the personal app, with trainer-authored/brand moments
+   routed through the dedicated --trainer-* tokens instead of a local green
+   literal. --coach-ink/--coach-green/--coach-border are kept as local alias
+   variables (contracts/ui-component-contract.md §1) purely so every
+   selector below didn't need touching one by one. */
+#app:has(.coaching-app),#app:has(.join-page){
+  max-width:none;padding:0;min-height:100vh;background:var(--bg);color:var(--label);
+}
+.coaching-app{
+  --coach-ink:var(--surface);
+  --coach-green:var(--trainer-text);
+  --coach-border:var(--sep);
+  display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh;
+  background:var(--bg);color:var(--label);
+}
+.coaching-nav{
+  position:sticky;top:0;height:100vh;padding:26px 18px;
+  background:var(--coach-ink);color:var(--label);display:flex;flex-direction:column;z-index:5;
+}
+.coaching-brand{display:flex;align-items:center;gap:12px;text-align:left;padding:0 8px 28px}
+.coaching-brand strong,.coaching-account strong{display:block;font-size:16px}
+.coaching-brand small,.coaching-account small{display:block;color:var(--label-2);font-size:12px;margin-top:2px}
+.coaching-mark{
+  display:grid;place-items:center;width:38px;height:38px;border-radius:var(--r);
+  background:var(--trainer-fill);color:var(--trainer-on-fill);font-size:23px;
+}
+.coaching-nav nav{display:grid;gap:6px}
+.coaching-nav nav a{
+  min-height:46px;display:flex;align-items:center;gap:12px;padding:0 13px;border-radius:var(--r);
+  color:var(--label-2);font-size:14px;font-weight:600;
+}
+.coaching-nav nav a:hover,.coaching-nav nav a.active{background:var(--surface-2);color:var(--label)}
+.coaching-nav nav a.active{box-shadow:inset 3px 0 var(--coach-green)}
+.coaching-account{margin-top:auto;border-top:var(--hair) solid var(--coach-border);padding:20px 8px 0;display:flex;gap:10px;align-items:center}
+.coaching-account>.icn{font-size:30px;color:var(--coach-green)}
+.coaching-main{padding:40px clamp(22px,5vw,72px) 80px;min-width:0}
+.coaching-header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:30px}
+.coaching-header p,.join-kicker{text-transform:uppercase;letter-spacing:.12em;font-size:11px;font-weight:700;color:var(--label-2);margin-bottom:7px}
+.coaching-header h1{font-size:clamp(30px,4vw,46px);line-height:1;letter-spacing:-.04em;color:var(--label)}
+.coaching-main .btn{color:var(--label);border:var(--hair) solid var(--coach-border);background:var(--surface)}
+.coaching-main .btn.primary,.join-page .btn.primary{background:var(--trainer-fill);border-color:var(--trainer-fill);color:var(--trainer-on-fill)}
+.coaching-banner,.coaching-hero{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;border-radius:var(--r-lg);
+  padding:22px 24px;margin-bottom:22px;background:color-mix(in srgb, var(--trainer-text) 16%, var(--surface));
+}
+.coaching-banner strong{font-size:17px}
+.coaching-banner p,.coaching-hero p,.coaching-panel p{color:var(--label-2);margin-top:5px;font-size:14px;line-height:1.5}
+.coaching-hero{padding:30px;background:var(--trainer-fill);color:var(--trainer-on-fill)}
+.coaching-hero span{color:var(--trainer-on-fill);font-size:12px;text-transform:uppercase;letter-spacing:.12em;font-weight:700;opacity:.85}
+.coaching-hero h2{font-size:26px;margin-top:8px}
+.coaching-hero p{color:var(--trainer-on-fill);opacity:.8;max-width:560px}
+.coaching-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:22px}
+.coaching-stat-grid article{background:var(--surface);border:var(--hair) solid var(--coach-border);border-radius:var(--r-lg);padding:20px}
+.coaching-stat-grid span{display:block;color:var(--label-2);font-size:12px;font-weight:600}
+.coaching-stat-grid strong{display:block;font-size:28px;margin-top:8px;letter-spacing:-.035em}
+.coaching-stat-grid .coaching-small-value{font-size:15px;line-height:1.4;overflow-wrap:anywhere}
+.coaching-panel{background:var(--surface);border:var(--hair) solid var(--coach-border);border-radius:var(--r-lg);padding:24px;margin-bottom:18px}
+.coaching-panel h2{font-size:18px}
+.coaching-panel-head{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:18px}
+.coaching-search{
+  width:min(270px,44%);height:42px;border:var(--hair) solid var(--coach-border);border-radius:var(--r);
+  display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--label-2);background:var(--surface-2);
+}
+.coaching-search input{width:100%;border:0;background:transparent;color:var(--label);outline:0;font-size:14px}
+.coaching-client-list{border-top:var(--hair) solid var(--coach-border)}
+.coaching-client-list>button,.coaching-invite-row{
+  width:100%;min-height:68px;display:flex;align-items:center;gap:12px;text-align:left;
+  border-bottom:var(--hair) solid var(--coach-border);padding:10px 4px;
+}
+.coaching-client-list>button>span:nth-child(2),.coaching-invite-row>span{flex:1}
+.coaching-client-list strong,.coaching-invite-row strong{display:block;text-transform:capitalize}
+.coaching-client-list small,.coaching-invite-row small{display:block;color:var(--label-2);font-size:12px;margin-top:4px}
+.coaching-avatar{
+  width:40px;height:40px;border-radius:var(--r);display:grid;place-items:center;
+  background:color-mix(in srgb, var(--trainer-text) 16%, var(--surface));color:var(--trainer-text);font-weight:700;
+}
+.coaching-empty{text-align:center;padding:34px;color:var(--label-2)}
+.coaching-empty>.icn{font-size:38px;margin:0 auto 10px;color:var(--label-3)}
+.coaching-empty h3{color:var(--label);margin-bottom:5px}
+.coaching-section-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.coaching-section-grid .coaching-panel{min-height:130px}
+.coaching-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.coaching-danger{margin-top:24px}
+.coaching-danger .btn{color:var(--red)}
+.coaching-muted{color:var(--label-2);font-size:14px}
+/* superseded by <StatusBadge status="error"> / ConflictBanner once the views that
+   render this class (coaching/*.jsx) are restyled in Phases 5–6 — colors retinted
+   now so it reads consistently with the rest of the system meanwhile */
+.coaching-error{padding:14px 16px;border-radius:var(--r);background:color-mix(in srgb, var(--red) 14%, var(--surface));color:var(--red);margin-bottom:16px}
+.coaching-share{display:flex;justify-content:space-between;gap:20px;align-items:center}
+.coaching-share strong{display:block;max-width:650px;margin:7px 0;overflow-wrap:anywhere}
+.coaching-share small{color:var(--label-2)}
+.coaching-form{max-width:720px;display:grid;gap:20px}
+.coaching-form label{display:grid;gap:7px}
+.coaching-form label>span{font-size:13px;font-weight:700}
+/* select was never covered here — invisible on the old light-themed trainer UI
+   (a white native select on a near-white page), a glaring unstyled white box now
+   that this surface is dark by default (found restyling Fees.jsx, Phase 6). */
+.coaching-form input,.coaching-form select{height:46px;border:var(--hair) solid var(--coach-border);border-radius:var(--r);padding:0 13px;background:var(--surface-2);color:var(--label)}
+.coaching-form label small{font-size:12px;color:var(--label-2)}
+.join-page{
+  min-height:100vh;display:grid;place-items:center;padding:30px 16px;
+  background:radial-gradient(circle at top, color-mix(in srgb, var(--trainer-text) 14%, var(--bg)), var(--bg) 50%);
+  color:var(--label);
+}
+.join-card{
+  width:min(680px,100%);background:var(--surface);border:var(--hair) solid var(--sep);border-radius:var(--r-xl);
+  padding:clamp(24px,5vw,46px);box-shadow:0 24px 70px color-mix(in srgb, var(--label) 10%, transparent);
+}
+.join-mark{display:grid;place-items:center;width:50px;height:50px;border-radius:var(--r-lg);background:var(--trainer-fill);color:var(--trainer-on-fill);font-size:28px;margin-bottom:22px}
+.join-card h1{font-size:clamp(30px,6vw,46px);line-height:1.04;letter-spacing:-.04em}
+.join-consent{background:var(--surface-2);border-radius:var(--r-lg);padding:20px;margin:24px 0}
+.join-consent h2{font-size:16px;margin-bottom:8px}
+.join-consent p{font-size:14px;line-height:1.55}
+.join-check{display:flex;align-items:flex-start;gap:12px;margin:22px 0;font-size:14px;line-height:1.45}
+.join-page .narrow{max-width:420px;margin:28px auto 0}
+.join-page .join-login>p{text-align:center;color:var(--label-2);font-size:14px}
+.join-page .btn{color:var(--label);border:var(--hair) solid var(--sep);background:var(--surface)}
+
+@media(max-width:760px){
+  .coaching-app{display:block;padding-bottom:76px}
+  .coaching-nav{
+    position:fixed;inset:auto 0 0 0;height:calc(64px + var(--sab));padding:6px 10px var(--sab);
+    display:block;background:color-mix(in srgb, var(--coach-ink) 95%, transparent);backdrop-filter:blur(16px);
+  }
+  .coaching-brand,.coaching-account{display:none}
+  .coaching-nav nav{height:58px;display:flex;justify-content:space-around;gap:4px}
+  .coaching-nav nav a{flex:1;min-width:0;min-height:54px;padding:5px;border-radius:var(--r-sm);display:flex;flex-direction:column;justify-content:center;gap:3px;font-size:10px}
+  .coaching-nav nav a.active{box-shadow:inset 0 -3px var(--coach-green)}
+  .coaching-nav nav a .icn{font-size:20px}
+  .coaching-main{padding:24px 16px 38px}
+  .coaching-header{align-items:center;margin-bottom:22px}
+  .coaching-header h1{font-size:31px}
+  .coaching-header .btn span{display:none}
+  .coaching-stat-grid{grid-template-columns:1fr 1fr}
+  .coaching-stat-grid article:last-child{grid-column:1/-1}
+  .coaching-panel{padding:18px;border-radius:var(--r-lg)}
+  .coaching-panel-head{display:block}
+  .coaching-search{width:100%;margin-top:14px}
+  .coaching-section-grid{grid-template-columns:1fr;gap:0}
+  .coaching-banner,.coaching-hero,.coaching-share{align-items:flex-start;flex-direction:column}
+  .coaching-client-list>button{min-height:72px}
+  .join-card{border-radius:var(--r-lg)}
+  .join-page{align-items:start;padding-top:16px}
+}
+@media(max-width:340px){
+  .coaching-main{padding-left:12px;padding-right:12px}
+  .coaching-stat-grid{grid-template-columns:1fr}
+  .coaching-stat-grid article:last-child{grid-column:auto}
+  .coaching-header h1{font-size:28px}
+  .coaching-panel{padding:15px}
+  .join-card{padding:20px 16px}
+}
+
+/* Tablet (768px) / desktop (1440px) reflow — the mobile pass above collapses
+   the sidebar into a bottom bar; these two checkpoints give the trainer's
+   denser, wider layouts room to breathe (constitution Principle II, FR-016). */
+@media(min-width:768px){
+  .coaching-section-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(min-width:1440px){
+  .coaching-app{grid-template-columns:280px minmax(0,1fr)}
+  .coaching-main{padding:48px clamp(32px,4vw,96px) 96px}
+  .coaching-stat-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}

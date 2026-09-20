@@ -1,0 +1,20 @@
+/* Weekly check-in (client submission + trainer review) — migrated onto the
+   shared tokens; see coaching.css's header comment for why. */
+.coaching-form textarea{border:var(--hair) solid var(--coach-border);border-radius:var(--r);padding:10px;background:var(--surface-2);color:var(--label);resize:vertical}
+.coaching-adherence{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.coaching-adherence button{min-height:44px;border:var(--hair) solid var(--coach-border);border-radius:var(--r)}
+.coaching-adherence button.on{background:var(--trainer-fill);color:var(--trainer-on-fill)}
+.coaching-inline{display:grid;grid-template-columns:1fr 100px;gap:8px}
+.coaching-response,.coaching-report{padding:16px;border-radius:var(--r);background:color-mix(in srgb, var(--trainer-text) 12%, var(--surface))}
+.coaching-response small{color:var(--label-2)}
+.coaching-subhead{margin-top:24px}
+.coaching-weight-list{display:grid;gap:6px;margin-top:12px}
+.coaching-weight-list>span{display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 0;border-bottom:var(--hair) solid var(--coach-border);font-size:13px}
+.coaching-weight-list small{color:var(--label-2)}
+
+@media(max-width:420px){
+  .coaching-adherence{grid-template-columns:1fr 1fr}
+}
+@media(min-width:1440px){
+  .coaching-adherence{grid-template-columns:repeat(4,minmax(0,160px))}
+}

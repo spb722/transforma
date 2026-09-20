@@ -1,0 +1,3 @@
+const key=uid=>`transforma_coaching_outbox_v1_${uid}`;
+export function createOutbox(storage=globalThis.localStorage){const read=uid=>{try{return JSON.parse(storage.getItem(key(uid))||'[]')}catch{return[]}};const write=(uid,items)=>storage.setItem(key(uid),JSON.stringify(items));return {pending:read,enqueue(uid,operation){if(!uid)throw new Error('Sign in before saving an assigned result');const items=read(uid);if(!items.some(x=>x.sessionId===operation.sessionId))items.push({...operation,queuedAt:new Date().toISOString()});write(uid,items);return operation},async flush(uid,send){const items=read(uid);for(const item of items){await send(item);write(uid,read(uid).filter(x=>x.sessionId!==item.sessionId))}return read(uid)}}}
+export const assignedOutbox=createOutbox();

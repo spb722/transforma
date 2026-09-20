@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">transforma</string>
+    <string name="title_activity_main">transforma</string>
+    <string name="package_name">com.transforma.app</string>
+    <string name="custom_url_scheme">com.transforma.app</string>
+</resources>

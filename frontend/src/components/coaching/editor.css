@@ -1,0 +1,95 @@
+/* Workout plan editor (templates, recurring editor, schedule manager) —
+   migrated onto the shared tokens; see coaching.css's header comment for why. */
+.coaching-schedule{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:16px}
+.coaching-schedule>div{padding:14px;border-radius:var(--r);background:var(--surface-2)}
+.coaching-schedule span,.coaching-schedule small{display:block;color:var(--label-2);font-size:11px;text-transform:capitalize}
+.coaching-schedule strong{display:block;font-size:14px;margin:5px 0}
+
+.coaching-editor{display:grid;gap:16px}
+.coaching-editor>label,.coaching-exercise label,.coaching-editor-heading>label{display:grid;gap:5px}
+.coaching-editor label>span,.coaching-exercise label>span,.coaching-occurrence-controls label>span{font-size:11px;font-weight:700;color:var(--label-2)}
+.coaching-editor input,.coaching-editor select,.coaching-editor textarea,
+.coaching-template-bar input,.coaching-template-bar select,.coaching-occurrence-list input{
+  min-height:42px;border:var(--hair) solid var(--coach-border);border-radius:var(--r);padding:8px 11px;
+  background:var(--surface-2);color:var(--label);
+}
+.coaching-editor-day{padding:18px;border-radius:var(--r-lg);background:var(--surface-2);display:grid;gap:13px}
+.coaching-editor-heading,.coaching-exercise-title{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.coaching-editor-heading>label{flex:1}
+.coaching-exercise-title>div{display:flex;gap:4px}
+.coaching-exercise-title>div:first-child{display:grid;gap:2px}
+.coaching-exercise-title small{display:block;color:var(--label-2)}
+.coaching-exercise-title button{min-width:36px;min-height:36px;border:var(--hair) solid var(--coach-border);border-radius:var(--r-sm);background:var(--surface-3);padding:0 8px}
+
+.coaching-weekdays{display:flex;gap:5px;flex-wrap:wrap}
+.coaching-weekdays button{width:38px;height:38px;border-radius:var(--r-sm);background:var(--surface);border:var(--hair) solid var(--coach-border);font-size:11px}
+/* "on" = this weekday is part of the recurring plan being authored — trainer-fill,
+   same fill used for the publish action, so the two read as one family (FR-011). */
+.coaching-weekdays button.on{background:var(--trainer-fill);color:var(--trainer-on-fill);border-color:var(--trainer-fill)}
+.coaching-weekdays button:disabled{opacity:.35}
+
+.coaching-exercise{display:grid;grid-template-columns:repeat(5,minmax(90px,1fr));gap:10px;padding:12px;background:var(--surface);border-radius:var(--r)}
+.coaching-exercise-title,.coaching-exercise-notes{grid-column:1/-1}
+.coaching-publish{margin-top:24px}
+.coaching-composer{scroll-margin-top:16px}
+.coaching-template-bar{display:grid;grid-template-columns:minmax(180px,1fr) minmax(260px,2fr);align-items:center;gap:16px 20px}
+.coaching-template-bar>.coaching-actions:last-child{grid-column:1/-1}
+.coaching-template-bar select,.coaching-template-bar input{max-width:260px}
+.coaching-current-plan{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.coaching-kicker{display:block;margin-bottom:6px;color:var(--label-2);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.coaching-save-status{margin:10px 4px;color:var(--label-2)}
+.coaching-occurrence-editor-panel{scroll-margin-top:20px}
+.coaching-occurrence-list{display:grid;gap:8px;margin-top:8px}
+.coaching-occurrence-list>div{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 0;border-top:var(--hair) solid var(--coach-border)}
+/* a occurrence pulled out for one-off editing (rescheduled/day-off/customized/
+   restored) gets its own bordered panel so it visually separates from the
+   recurring-plan list above it — never the same shared tokens as .coaching-exercise
+   so "this diverges from the recurring plan" stays legible at a glance (FR-011). */
+.coaching-occurrence-list>div.managed{padding:14px;border:var(--hair) solid var(--trainer-text);border-radius:var(--r);background:var(--surface-2)}
+.coaching-occurrence-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:240px;flex:1}
+.coaching-occurrence-summary>span:first-child{min-width:0}
+.coaching-occurrence-list span small{display:block;color:var(--label-2);margin-top:3px}
+.coaching-occurrence-controls{width:100%;display:flex;align-items:end;flex-wrap:wrap;gap:8px;padding-top:10px;border-top:var(--hair) solid var(--coach-border)}
+.coaching-occurrence-controls label{display:grid;gap:5px}
+.coaching-occurrence-controls .coaching-error{width:100%;margin:4px 0 0}
+.coaching-lock-note{font-size:12px;color:var(--label-2)}
+.coaching-schedule-group{margin-top:22px}
+.coaching-schedule-group h3{font-size:14px}
+.coaching-empty-inline{padding:10px 0}
+.coaching-catalog{padding:14px;border-radius:var(--r);background:var(--surface)}
+.coaching-catalog-picker{display:grid;gap:10px}
+.coaching-catalog-picker .search{display:flex;align-items:center;gap:8px;border:var(--hair) solid var(--coach-border);border-radius:var(--r);padding:0 10px}
+.coaching-catalog-picker .search input{border:0;background:transparent}
+.coaching-catalog-picker .chips{display:flex;gap:5px;overflow:auto}
+.coaching-catalog-picker .chip{flex:none;padding:7px 10px;border:var(--hair) solid var(--coach-border);border-radius:var(--r-sm);background:var(--surface);color:var(--label)}
+.coaching-catalog-picker .chip.on{background:var(--trainer-fill);color:var(--trainer-on-fill)}
+.coaching-catalog-results{max-height:420px;overflow:auto}
+.coaching-catalog-results .item{width:100%;text-align:left;color:var(--label)}
+.coaching-catalog-results .tt,.coaching-catalog-results .ss{display:block}
+
+@media(max-width:900px){
+  .coaching-exercise{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .coaching-template-bar{display:block}
+  .coaching-template-bar .coaching-actions{margin-top:14px}
+  .coaching-current-plan{align-items:flex-start;flex-direction:column}
+  .coaching-occurrence-summary{width:100%}
+}
+@media(max-width:480px){
+  .coaching-exercise{grid-template-columns:1fr}
+  .coaching-exercise-title,.coaching-exercise-notes{grid-column:auto}
+  .coaching-exercise-title{align-items:stretch;flex-direction:column}
+  .coaching-template-bar select,.coaching-template-bar input{max-width:none;width:100%}
+  .coaching-occurrence-summary{align-items:flex-start;flex-direction:column}
+  .coaching-occurrence-controls{display:grid;grid-template-columns:1fr}
+  .coaching-occurrence-controls .btn,.coaching-occurrence-controls label,.coaching-occurrence-controls input{width:100%}
+}
+
+/* Tablet / desktop — let the template bar and exercise grid use the extra
+   width instead of staying phone-narrow (FR-016). */
+@media(min-width:768px){
+  .coaching-exercise{grid-template-columns:repeat(3,minmax(110px,1fr))}
+}
+@media(min-width:1440px){
+  .coaching-exercise{grid-template-columns:repeat(6,minmax(100px,1fr))}
+  .coaching-template-bar{grid-template-columns:minmax(220px,1fr) minmax(320px,2fr)}
+}

@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';import{whatsAppUrl}from'../../components/coaching/ContactTrainer.jsx';describe('trainer contact',()=>{it('uses only normalized digits and no private message query',()=>{expect(whatsAppUrl('+91 98765 43210')).toBe('https://wa.me/919876543210');expect(whatsAppUrl(null)).toBe(null);expect(whatsAppUrl('+123')).not.toContain('?')})});

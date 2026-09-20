@@ -1,0 +1,9 @@
+{
+  "appId": "com.transforma.app",
+  "appName": "transforma",
+  "webDir": "dist",
+  "backgroundColor": "#201e1d",
+  "android": {
+    "allowMixedContent": false
+  }
+}
