@@ -16,7 +16,7 @@ import {
   hasEffort, displayScale, scaleName, toScale, avgRir, effortSummary, effortWeeks,
   effortHistogram, isHardSet, HARD_RIR
 } from '../lib/effort.js'
-import { Button, Segmented, SelectRow } from '../components/ui.jsx'
+import { Button, Segmented, SelectRow, ScreenHeader } from '../components/ui.jsx'
 
 // Which muscles the training in a window actually hit — and, the point of the card,
 // which ones it keeps missing. Shading is relative within the window (lib/muscles.js).
@@ -41,9 +41,9 @@ function MuscleBalance({ S }) {
   const max = worked.length ? load[worked[0]] : 0
   const sets = m => Math.round((load[m] || 0) * 10) / 10
 
-  return <div className="card">
+  return <div className="bcell">
     <div className="row between" style={{ marginBottom: 8 }}>
-      <h2 style={{ margin: 0 }}>{t('Muscle balance')} <span className="dim" style={{ textTransform: 'none', letterSpacing: 0 }}>· {on ? t('by hard sets') : t('by sets worked')}</span></h2>
+      <div className="eyebrow">{t('Muscle balance')} · {on ? t('by hard sets') : t('by sets worked')}</div>
       {rated && <Button size="sm" icon="flame" style={on ? { color: 'var(--yellow)' } : undefined}
         onClick={() => { setHard(h => !h); setSel(null) }}>{on ? t('Hard') : t('All')}</Button>}
     </div>
@@ -93,8 +93,8 @@ function EffortCard({ S }) {
   // Bins run hardest-first in both scales: RIR 0 and RPE 10 are the same set.
   const binLabel = b => kind === 'rpe' ? (b.tail ? '≤ 6' : String(10 - b.rir)) : (b.tail ? b.rir + '+' : String(b.rir))
 
-  return <div className="card">
-    <h2>{t('Effort')} <span className="dim" style={{ textTransform: 'none', letterSpacing: 0 }}>· {t('how close to failure')}</span></h2>
+  return <div className="bcell">
+    <div className="eyebrow" style={{ marginBottom: 8 }}>{t('Effort')} · {t('how close to failure')}</div>
     <Segmented className="seg-range" value={win} onChange={setWin}
       options={[{ value: 30, label: '30d' }, { value: 90, label: '90d' }, { value: 365, label: '1Y' }, { value: 0, label: t('All') }]} />
     {sum.rated === 0 ? <div className="muted small">{t('No rated sets in this period.')}</div> : <>
@@ -194,29 +194,35 @@ export default function Stats() {
   if (showE1) exOpts.push({ value: 'e1rm', label: t('Est. 1RM') })
   if (showEff) exOpts.push({ value: 'effort', label: t('Effort') })
 
-  return <>
-    <div className="hdr"><div><h1>{t('Stats')}</h1><div className="sub">{t('Progress & history')}</div></div>
-      <button className="iconbtn" onClick={() => nav('/history')} aria-label={t('History')}><Icon name="history" /></button></div>
+  return <div className="narrow">
+    <ScreenHeader
+      title={t('Stats')}
+      subtitle={t('Progress & history')}
+      onDeviceLabel={t('On device')}
+      action={<button className="iconbtn" style={{ width: 32, height: 32 }} onClick={() => nav('/history')} aria-label={t('History')}><Icon name="history" /></button>}
+    />
 
-    <div className="tiles">
-      <div className="tile"><div className="l"><Icon name="dumbbell" />{t('Workouts')}</div><div className="v">{S.workouts.length}</div></div>
-      <div className="tile"><div className="l"><Icon name="calendar" />{t('This month')}</div><div className="v">{monthW}</div></div>
-      <div className="tile"><div className="l"><Icon name="flame" />{t('Week streak')}</div><div className="v">{streakWeeks(S)}</div></div>
-      <div className="tile"><div className="l"><Icon name="scale" />{t('Weight 30d')}</div><div className="v" style={{ fontSize: 22, color: bwDelta30 === null ? 'inherit' : bwDeltaColor(bwDelta30, (lastBW(S) || {}).w || 0) }}>{bwDelta30 === null ? '—' : (bwDelta30 > 0 ? '+' : '') + fmtNum(bwDelta30) + ' ' + S.unit}</div></div>
+    <div className="bgrid bgrid-2" style={{ marginTop: 22 }}>
+      <div className="bcell"><div className="eyebrow"><Icon name="dumbbell" />{t('Workouts')}</div><div className="big">{S.workouts.length}</div></div>
+      <div className="bcell"><div className="eyebrow"><Icon name="calendar" />{t('This month')}</div><div className="big">{monthW}</div></div>
+      <div className="bcell"><div className="eyebrow"><Icon name="flame" />{t('Week streak')}</div><div className="big">{streakWeeks(S)}</div></div>
+      <div className="bcell"><div className="eyebrow"><Icon name="scale" />{t('Weight 30d')}</div>
+        <div className="big" style={{ fontSize: 26, color: bwDelta30 === null ? 'inherit' : bwDeltaColor(bwDelta30, (lastBW(S) || {}).w || 0) }}>{bwDelta30 === null ? '—' : (bwDelta30 > 0 ? '+' : '') + fmtNum(bwDelta30) + ' ' + S.unit}</div>
+      </div>
     </div>
 
-    <div className="card">
-      <h2>{t('Activity — last 12 months')} <span className="dim" style={{ textTransform: 'none', letterSpacing: 0 }}>· {t('by time trained')}</span></h2>
+    <div className="bcell" style={{ marginTop: 2 }}>
+      <div className="eyebrow" style={{ marginBottom: 8 }}>{t('Activity — last 12 months')} · {t('by time trained')}</div>
       <Heatmap S={S} onDay={iso => { const ws = S.workouts.filter(w => w.d === iso); if (ws.length === 1) workoutDetailSheet(ws[0]); else if (ws.length) calendarSheet(iso) }} />
     </div>
 
-    {S.workouts.length > 0 && <MuscleBalance S={S} />}
-    {anyEffort && <EffortCard S={S} />}
+    {S.workouts.length > 0 && <div style={{ marginTop: 22 }}><MuscleBalance S={S} /></div>}
+    {anyEffort && <div style={{ marginTop: 22 }}><EffortCard S={S} /></div>}
 
-    <div className="cols">
-      <div className="card">
+    <div className="cols" style={{ marginTop: 22 }}>
+      <div className="bcell">
         <div className="row between" style={{ marginBottom: 8 }}>
-          <h2 style={{ margin: 0 }}>{t('Body weight')}</h2>
+          <div className="eyebrow">{t('Body weight')}</div>
           <div className="row" style={{ gap: 8 }}>
             <Button size="sm" icon="target" style={S.targetW ? { color: 'var(--yellow)' } : undefined} onClick={goalSheet}>{S.targetW ? fmtNum(S.targetW) : t('Goal')}</Button>
             <Button size="sm" icon="plus" onClick={() => bwSheet()}>{t('Log')}</Button>
@@ -227,8 +233,8 @@ export default function Stats() {
         <div className="chart"><LineChart points={bwPts} h={160} unit={S.unit} goal={S.targetW} /></div>
       </div>
 
-      <div className="card">
-        <h2>{t('Exercise progress')}</h2>
+      <div className="bcell">
+        <div className="eyebrow" style={{ marginBottom: 8 }}>{t('Exercise progress')}</div>
         {exHist.length ? <>
           <div className="sect-b" style={{ marginBottom: 10 }}>
             <SelectRow title={t('Exercise')} sheetTitle={t('Exercise progress')} value={curEx} onChange={setExId}
@@ -256,12 +262,12 @@ export default function Stats() {
       </div>
     </div>
 
-    {S.workouts.length > 0 && <>
+    {S.workouts.length > 0 && <div style={{ marginTop: 22 }}>
       <div className="row between" style={{ marginBottom: 10 }}>
-        <h4 className="sec" style={{ margin: 0 }}>{t('Recent workouts')}</h4>
+        <div className="eyebrow">{t('Recent workouts')}</div>
         <Button size="sm" variant="ghost" trailingIcon="chevronRight" onClick={() => nav('/history')}>{t('All')} {S.workouts.length}</Button>
       </div>
       <div className="list">{[...S.workouts].reverse().slice(0, 6).map(w => <WorkoutRow key={w.id} w={w} onClick={() => workoutDetailSheet(w)} />)}</div>
-    </>}
-  </>
+    </div>}
+  </div>
 }

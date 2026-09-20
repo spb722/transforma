@@ -7,7 +7,7 @@ import { t, dateLocale } from '../lib/i18n.js'
 import { bwSheet, goalSheet, dayOverrideSheet, calendarSheet, startFlow, loadStarterPlan, bwDeltaColor } from '../sheets.jsx'
 import LineChart from '../components/LineChart.jsx'
 import Icon from '../components/Icon.jsx'
-import { Button, StatusBadge, EmptyState } from '../components/ui.jsx'
+import { Button, EmptyState, ScreenHeader } from '../components/ui.jsx'
 import { glyphOf } from '../lib/glyphs.js'
 import { coachAvailable, hasConsent } from '../lib/coach.js'
 import { useCoachStatus } from '../lib/coach-api.js'
@@ -79,10 +79,18 @@ export default function Home() {
     const d = new Date(monday); d.setDate(monday.getDate() + i)
     const iso = isoOf(d)
     const eff = effectiveRoutineId(S, iso), ovr = S.dayPlan[iso] !== undefined, done = doneDays.has(iso)
+    const routineHere = eff ? S.routines.find(r => r.id === eff) : null
     const coachOccurrence = coachPlanActive ? occurrenceOnDate(ownWorkspace, iso) : null
     const dot = done || coachOccurrence?.state === 'completed' ? ' done' : ['scheduled', 'started'].includes(coachOccurrence?.state) ? ' plan' : coachOccurrence?.state === 'canceled' ? ' ovr' : !coachPlanActive && ovr && eff ? ' ovr' : !coachPlanActive && eff ? ' plan' : ''
-    strip.push(<button key={i} className={'wday' + (iso === todayISO() ? ' today' : '') + (coachPlanActive && iso === coachDate ? ' selected' : '')} onClick={coachPlanActive ? () => setSelectedCoachDate(iso) : () => dayOverrideSheet(iso)}>
-      <div className="lbl">{t(DAYS[d.getDay()])}</div><div className="num">{d.getDate()}</div><div className={'dot' + dot} /></button>)
+    // Same facts the dot colour above already encodes, spelled out as a short word
+    // instead — the 2a direction reads a day's plan as text, not just a coloured mark.
+    const label = coachOccurrence
+      ? (coachOccurrence.state === 'canceled' ? t('Off') : (coachOccurrence.prescription?.dayName || t('Assigned')).split(' ')[0])
+      : ovr && !eff ? t('Off')
+        : routineHere ? routineHere.name.split(' ')[0]
+          : '—'
+    strip.push(<button key={i} className={'daycell' + (iso === todayISO() ? ' today' : '') + (coachPlanActive && iso === coachDate ? ' selected' : '') + (dot ? ' has-' + dot.trim() : '')} onClick={coachPlanActive ? () => setSelectedCoachDate(iso) : () => dayOverrideSheet(iso)}>
+      <div className="lbl">{t(DAYS[d.getDay()])}</div><div className="num">{d.getDate()}</div><div className="daylabel">{label}</div></button>)
   }
   const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6)
   const wkLabel = weekOffset === 0 ? t('This week') : `${monday.getDate()} ${monday.toLocaleDateString(dateLocale(), { month: 'short' })} – ${sunday.getDate()} ${sunday.toLocaleDateString(dateLocale(), { month: 'short' })}`
@@ -118,48 +126,59 @@ export default function Home() {
           : selectedOccurrence?.customized ? t('Customized')
             : selectedOccurrence?.overrideDate ? t('Rescheduled')
               : selectedOccurrence?.state === 'scheduled' ? t('Coach assigned') : null
-  // Same derivation, mapped to StatusBadge's status vocabulary (FR-025: an icon
-  // always rides with the color, never color alone) — the label text above is
-  // untouched, this only picks the badge's icon/tone.
-  const coachStateKey = selectedOccurrence?.state === 'started' ? 'in-progress'
-    : selectedOccurrence?.state === 'completed' ? 'completed'
-      : selectedOccurrence?.state === 'canceled' ? 'day-off'
-        : selectedOccurrence?.customized ? 'customized'
-          : selectedOccurrence?.overrideDate ? 'rescheduled'
-            : selectedOccurrence?.state === 'scheduled' ? 'coach-assigned' : null
+
+  // Trainer-authored days get the full-bleed green block (research.md §1a: green is
+  // reserved for the primary action and for anything the trainer authored); a
+  // self-directed day is plain surface, with the primary action itself carrying green.
+  const primaryLabel = S.active ? t('Resume')
+    : coachPlanActive && selectedIsToday && selectedOccurrence?.state === 'started' ? t('Resume')
+      : coachPlanActive && selectedIsToday && selectedOccurrence?.state === 'scheduled' ? t('Start workout')
+        : coachPlanActive && selectedOccurrence ? t('View coach schedule')
+          : coachPlanActive ? null
+            : routine ? t('Start') : null
+  const todayTitle = S.active ? t('{0} — in progress', S.active.name) : coachPlanActive ? coachTitle : routine ? routine.name : t('Rest day')
+  const todayMeta = coachPlanActive && coachStateLabel ? ' · ' + coachStateLabel : todayOvr && routine ? ' · ' + t('rescheduled') : ''
 
   return <div className="narrow">
-    <div className="hdr">
-      <div><h1>{user ? t('Hi {0}', user.name) : 'transforma'}</h1><div className="sub">{today.toLocaleDateString(dateLocale(), { weekday: 'long', day: 'numeric', month: 'long' })}</div></div>
-      <button className="iconbtn" onClick={() => nav('/settings')} aria-label={t('Settings')}><Icon name="gear" /></button>
-    </div>
+    <ScreenHeader
+      title={user ? t('Hi {0}', user.name) : 'transforma'}
+      subtitle={today.toLocaleDateString(dateLocale(), { weekday: 'long', day: 'numeric', month: 'long' })}
+      onDeviceLabel={t('On device')}
+      action={<button className="iconbtn" style={{ width: 32, height: 32 }} onClick={() => nav('/settings')} aria-label={t('Settings')}><Icon name="gear" /></button>}
+    />
 
-    <div className="card">
-      <div className="row between" style={{ marginBottom: 8 }}>
-        <button className="iconbtn" style={{ fontSize: 15 }} onClick={() => moveWeek(-1)} aria-label="Previous week"><Icon name="chevronLeft" /></button>
-        <div className="small muted" style={{ fontWeight: 500 }}>{wkLabel}</div>
-        <button className="iconbtn" style={{ fontSize: 15 }} onClick={() => moveWeek(1)} aria-label="Next week"><Icon name="chevronRight" /></button>
+    {coachPlanActive ? (
+      <div className="trainer-block" style={{ marginTop: 22 }}>
+        <div className="eyebrow"><Icon name="personCircle" />{selectedIsToday ? t('Today · given by your trainer') : fmtDate(coachDate, true)}</div>
+        <h2>{todayTitle}{todayMeta}</h2>
+        {selectedOccurrence && <div className="meta">{selectedOccurrence.scheduledDate} · {ownWorkspace.relationship.timeZone}</div>}
+        {primaryLabel && (
+          <button className="trainer-cta" onClick={onPrimary}>
+            <span>{primaryLabel}</span><Icon name="arrowRight" />
+          </button>
+        )}
       </div>
-      <div className="week">{strip}</div>
-      <div className="today-row" onClick={onPrimary}>
-        <div className="row" style={{ gap: 9, minWidth: 0 }}>
-          <span className="lrow-i" style={{ background: S.active || selectedOccurrence?.state === 'started' ? 'var(--orange)' : selectedOccurrence?.state === 'scheduled' || routine ? 'var(--acc)' : 'var(--surface-3)' }}>
-            <Icon name={S.active || selectedOccurrence?.state === 'started' ? 'timer' : selectedOccurrence ? 'dumbbell' : routine ? glyphOf(routine.emoji) : 'moon'} />
-          </span>
+    ) : (
+      // The whole block stays tappable (not just the accessory) — a rest day with
+      // nothing to start still opens the day-override sheet via onPrimary, same as
+      // before this restyle.
+      <button className="bcell" style={{ marginTop: 18, width: '100%', textAlign: 'left' }} onClick={onPrimary}>
+        <div className="row between" style={{ alignItems: 'flex-start' }}>
           <div style={{ minWidth: 0 }}>
-            <div className="lbl2">{coachPlanActive ? selectedIsToday ? t('Today') : fmtDate(coachDate, true) : t('Today')}</div>
-            <div className="ttl">{S.active ? t('{0} — in progress', S.active.name) : coachPlanActive ? coachTitle : routine ? routine.name : t('Rest day')}{coachPlanActive && coachStateLabel ? ' · ' + coachStateLabel : todayOvr && routine ? ' · ' + t('rescheduled') : ''}</div>
-            {coachPlanActive && selectedOccurrence && <div className="small muted">{selectedOccurrence.scheduledDate} · {ownWorkspace.relationship.timeZone}</div>}
+            <div className="eyebrow"><Icon name={S.active ? 'timer' : routine ? glyphOf(routine.emoji) : 'moon'} />{t('Today')}</div>
+            <h2 style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-.02em', margin: '6px 0 0' }}>{todayTitle}{todayMeta}</h2>
           </div>
+          {primaryLabel ? <span className="tag acc" style={{ flex: 'none' }}>{primaryLabel}</span> : <Icon name="plus" className="chev" />}
         </div>
-        {S.active ? <span className="tag" style={{ color: 'var(--orange)', background: 'color-mix(in srgb,var(--orange) 16%,transparent)' }}>{t('Resume')}</span>
-          : coachPlanActive && selectedIsToday && selectedOccurrence?.state === 'started' ? <span className="tag" style={{ color: 'var(--orange)', background: 'color-mix(in srgb,var(--orange) 16%,transparent)' }}>{t('Resume')}</span>
-            : coachPlanActive && selectedIsToday && selectedOccurrence?.state === 'scheduled' ? <span className="tag acc">{t('Start')}</span>
-              : coachPlanActive && selectedOccurrence ? <StatusBadge status={coachStateKey} label={coachStateLabel} />
-                : routine ? <span className="tag acc">{t('Start')}</span>
-          : coachPlanActive ? null : <Icon name="plus" className="chev" />}
-      </div>
+      </button>
+    )}
+
+    <div className="row between" style={{ margin: '22px 0 10px' }}>
+      <button className="eyebrow" style={{ minHeight: 32 }} onClick={() => moveWeek(-1)} aria-label="Previous week"><Icon name="chevronLeft" />{t('Prev')}</button>
+      <div className="eyebrow" style={{ color: 'var(--label)' }}>{wkLabel}</div>
+      <button className="eyebrow" style={{ minHeight: 32 }} onClick={() => moveWeek(1)} aria-label="Next week">{t('Next')}<Icon name="chevronRight" /></button>
     </div>
+    <div className="bgrid bgrid-7">{strip}</div>
 
     {coachOn && !coachPlanActive && <CoachCard nav={nav} />}
 
@@ -179,17 +198,30 @@ export default function Home() {
       />
     )}
 
-    <div className="card">
+    <div className="bgrid bgrid-2" style={{ marginTop: 22 }}>
+      <div className="bcell">
+        <div className="eyebrow"><Icon name="flame" />{t('Week streak')}</div>
+        <div className="big">{streakWeeks(S)}</div>
+        <div className="sub">{wThisWeek}{plannedPerWeek ? ' / ' + plannedPerWeek : ''} {t('this week')}</div>
+      </div>
+      <button className="bcell" style={{ textAlign: 'left' }} onClick={() => calendarSheet()}>
+        <div className="eyebrow"><Icon name="dumbbell" />{t('Workouts')}</div>
+        <div className="big">{S.workouts.length}</div>
+        <div className="sub">{t('total · view calendar')}</div>
+      </button>
+    </div>
+
+    <div className="bcell" style={{ marginTop: 2 }}>
       <div className="row between" style={{ marginBottom: 6 }}>
-        <h2 style={{ margin: 0 }}>{t('Body weight')}</h2>
-        <div className="row" style={{ gap: 8 }}>
-          <Button size="sm" icon="target" style={S.targetW ? { color: 'var(--yellow)' } : undefined} onClick={goalSheet}>{S.targetW ? fmtNum(S.targetW) : t('Goal')}</Button>
-          <Button size="sm" icon="plus" onClick={() => bwSheet()}>{t('Log')}</Button>
+        <div className="eyebrow"><Icon name="scale" />{t('Body weight')}</div>
+        <div className="row" style={{ gap: 16 }}>
+          <button className="tag acc" style={S.targetW ? { color: 'var(--yellow)' } : undefined} onClick={goalSheet}>{S.targetW ? fmtNum(S.targetW) : t('Goal')}</button>
+          <button className="tag acc" onClick={() => bwSheet()}><Icon name="plus" />{t('Log')}</button>
         </div>
       </div>
       {bw ? <>
         <div className="row" style={{ gap: 8, alignItems: 'baseline' }}>
-          <div className="big">{fmtNum(bw.w)} <span className="muted" style={{ fontSize: '1rem' }}>{S.unit}</span></div>
+          <div className="big">{fmtNum(bw.w)} <span className="unit">{S.unit}</span></div>
           {/* only when it actually moved — an unchanged weight used to read as "− 0" */}
           {!!delta && (
             <span className="small row" style={{ gap: 2, fontWeight: 500, color: bwDeltaColor(delta, bw.w) }}>
@@ -206,20 +238,7 @@ export default function Home() {
           </div>
         )}
         <div className="chart" style={{ marginTop: 8 }}><LineChart points={bwPoints} h={130} unit={S.unit} goal={S.targetW} /></div>
-      </> : <div className="muted small">{t("No entries yet — log your weight to start the curve. It's also asked before every workout.")}</div>}
-    </div>
-
-    <div className="card tappable" style={{ cursor: 'pointer' }} onClick={() => calendarSheet()}>
-      <div className="row between">
-        <div>
-          <div className="row" style={{ gap: 7, fontSize: 22, fontWeight: 600, letterSpacing: '-.021em' }}>
-            <Icon name="flame" style={{ color: 'var(--orange)' }} />
-            {t('{0} week streak', streakWeeks(S))}
-          </div>
-          <div className="muted small" style={{ marginTop: 2 }}>{wThisWeek}{plannedPerWeek ? ' / ' + plannedPerWeek : ''} {t('this week')} · {t(S.workouts.length === 1 ? '{0} workout total' : '{0} workouts total', S.workouts.length)}</div>
-        </div>
-        <Icon name="calendar" className="chev" style={{ fontSize: 20 }} />
-      </div>
+      </> : <div style={{ marginTop: 2, fontSize: 14, color: 'var(--label-2)' }}>{t("No entries yet — log your weight to start the curve. It's also asked before every workout.")}</div>}
     </div>
   </div>
 }

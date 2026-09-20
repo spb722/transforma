@@ -4,7 +4,7 @@ import { DAYN, uid, exCount } from '../lib/format.js'
 import { t } from '../lib/i18n.js'
 import { dayAssignSheet, loadStarterPlan, planToolsSheet } from '../sheets.jsx'
 import Icon from '../components/Icon.jsx'
-import { Button, StatusBadge, EmptyState } from '../components/ui.jsx'
+import { Button, StatusBadge, EmptyState, ScreenHeader } from '../components/ui.jsx'
 import { glyphOf, DEFAULT_GLYPH } from '../lib/glyphs.js'
 import { coachAvailable } from '../lib/coach.js'
 import { DEMO } from '../lib/demo.js'
@@ -29,100 +29,117 @@ export default function Plan() {
     nav('/plan/r/' + r.id)
   }
 
-  return <>
-    <div className="hdr">
-      <div><h1>{t('Plan')}</h1><div className="sub">{coachPlanActive ? t('Your coach-assigned schedule') : t('Your weekly routine')}</div></div>
-      {!coachPlanActive && coachOn && <button className="iconbtn" onClick={() => nav('/coach')} aria-label={t('Coach')} title={t('Coach')}><Icon name="sparkles" /></button>}
-      {!coachPlanActive && <button className="iconbtn" onClick={planToolsSheet} aria-label={t('Share your plan')} title={t('Share your plan')}><Icon name="upload" /></button>}
-    </div>
-    {coachPlanActive ? <CoachAssignedPlan workspace={ownWorkspace} assigned={assigned} /> : <div className="cols"><div>
-      <h4 className="sec">{t('Week schedule')}</h4>
-      <div className="list" style={{ display: 'flex', flexDirection: 'column' }}>
+  return <div className="narrow">
+    <ScreenHeader
+      title={t('Plan')}
+      subtitle={coachPlanActive ? t('Your coach-assigned schedule') : t('Your weekly routine')}
+      onDeviceLabel={t('On device')}
+      action={<div className="row" style={{ gap: 14 }}>
+        {!coachPlanActive && coachOn && <button className="iconbtn" style={{ width: 32, height: 32 }} onClick={() => nav('/coach')} aria-label={t('Coach')} title={t('Coach')}><Icon name="sparkles" /></button>}
+        {!coachPlanActive && <button className="iconbtn" style={{ width: 32, height: 32 }} onClick={planToolsSheet} aria-label={t('Share your plan')} title={t('Share your plan')}><Icon name="upload" /></button>}
+      </div>}
+    />
+    {coachPlanActive ? <CoachAssignedPlan workspace={ownWorkspace} assigned={assigned} /> : <>
+      <div className="eyebrow" style={{ margin: '22px 0 2px' }}>{t('Week schedule')}</div>
+      <div className="blocklist">
         {[1, 2, 3, 4, 5, 6, 0].map(d => {
           const r = S.routines.find(x => x.id === S.week[d])
-          return <div key={d} className="item" onClick={() => dayAssignSheet(d)}>
-            <div className="grow"><div className="tt">{t(DAYN[d])}</div></div>
+          return <button key={d} className="row between" style={{ width: '100%', textAlign: 'left' }} onClick={() => dayAssignSheet(d)}>
+            <div className="grow" style={{ fontSize: 15, fontWeight: 600 }}>{t(DAYN[d])}</div>
             {r ? <span className="tag acc"><Icon name={glyphOf(r.emoji)} />{r.name}</span> : <span className="tag">{t('Rest')}</span>}
-            <Icon name="chevronRight" className="chev" /></div>
+            <Icon name="chevronRight" className="chev" /></button>
         })}
       </div>
-    </div><div>
-      <div className="row between" style={{ marginTop: 22, marginBottom: 10 }}>
-        <h4 className="sec" style={{ margin: 0 }}>{t('Routines')}</h4>
+
+      <div className="row between" style={{ marginTop: 22, marginBottom: 2 }}>
+        <div className="eyebrow">{t('Routines')}</div>
         <Button size="sm" variant="tinted" icon="plus" onClick={addRoutine}>{t('New')}</Button>
       </div>
-      {S.routines.length ? <div className="list">{S.routines.map(r => <div key={r.id} className="item" onClick={() => nav('/plan/r/' + r.id)}>
+      {S.routines.length ? <div className="blocklist">{S.routines.map(r => <button key={r.id} className="row between" style={{ width: '100%', textAlign: 'left' }} onClick={() => nav('/plan/r/' + r.id)}>
         <span className="lrow-i"><Icon name={glyphOf(r.emoji)} /></span>
         <div className="grow"><div className="tt">{r.name}</div><div className="ss">{exCount(r.ex.length)}</div></div>
-        <Icon name="chevronRight" className="chev" /></div>)}</div> : (
+        <Icon name="chevronRight" className="chev" /></button>)}</div> : (
         <EmptyState
+          className="bcell"
           icon="clipboard"
           title={t('No routines yet.')}
           description={t('Create one or load the starter plan.')}
           action={<Button icon="sparkles" onClick={loadStarterPlan}>{t('Load starter plan (Push / Pull / Legs)')}</Button>}
         />
       )}
-    </div></div>}
-  </>
+    </>}
+  </div>
 }
 
 function CoachAssignedPlan({ workspace, assigned }) {
   const plan = workspace.workout.content
-  return <div className="narrow">
-    {/* Trainer-authored content is marked with the dedicated trainer-authority
-        tokens (border + badge), not the client's personal accent — the signal
-        must read the same regardless of which of the 8 accent colors this
-        client has chosen (FR-007, contracts/ui-component-contract.md §1). */}
-    <div className="card" style={{ marginBottom: 18, borderColor: 'var(--trainer-text)' }}>
-      <div className="row between"><div><div className="lbl2">{t('Coach-assigned plan')}</div><div className="big">{plan.name}</div></div><StatusBadge status="read-only" label={t('Read only')} /></div>
-      <div className="small muted" style={{ marginTop: 8 }}>{t('Your trainer manages this plan and its schedule.')}</div>
+  return <>
+    {/* Trainer-authored content carries the dedicated trainer-authority eyebrow
+        colour, not the client's personal accent — the signal must read the same
+        regardless of which of the 8 accent colors this client has chosen
+        (FR-007, contracts/ui-component-contract.md §1). */}
+    <div className="bcell" style={{ marginTop: 18 }}>
+      <div className="row between" style={{ alignItems: 'flex-start', gap: 12 }}>
+        <div>
+          <div className="eyebrow eyebrow-trainer"><Icon name="personCircle" />{t('Coach-assigned plan')}</div>
+          <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-.02em', marginTop: 2 }}>{plan.name}</div>
+          <div style={{ fontSize: 13, color: 'var(--label-2)', marginTop: 4 }}>{t('Your trainer manages this plan and its schedule.')}</div>
+        </div>
+        <StatusBadge status="read-only" label={t('Read only')} />
+      </div>
     </div>
 
-    <h4 className="sec">{t('Training plan')}</h4>
-    <div style={{ display: 'grid', gap: 12 }}>
-      {plan.days.map(day => <div className="card" key={day.id}>
-        <div className="row between" style={{ marginBottom: 10 }}>
-          <h2 style={{ margin: 0 }}>{day.name}</h2>
-          <span className="tag">{(day.weekdays || []).map(coachWeekday).join(' · ')}</span>
+    <div className="eyebrow" style={{ margin: '22px 0 2px' }}>{t('Training plan')}</div>
+    {plan.days.map((day, i) => {
+      // "All sets rest Xs" only if every timed/reps exercise in the day actually
+      // agrees on X — a real plan's rest periods vary far more than the design's
+      // single-example mockup, so a wrong specific number would be worse than
+      // dropping it.
+      const restValues = new Set(day.exercises.map(e => e.restSec).filter(v => v != null))
+      const restNote = restValues.size === 1 ? t('All sets rest {0}s · targets are your trainer\'s.', [...restValues][0]) : t("Targets are your trainer's.")
+      const nextDay = plan.days[i + 1]
+      return <div key={day.id} style={{ marginBottom: 2 }}>
+        <div className="row between" style={{ alignItems: 'baseline', marginTop: 20, paddingBottom: 8, borderBottom: '2px solid var(--label)' }}>
+          <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-.01em' }}>{day.name}</div>
+          <div className="eyebrow" style={{ fontSize: 11 }}>{(day.weekdays || []).map(coachWeekday).join(' · ')}</div>
         </div>
-        <div className="list">{day.exercises.map(exercise => <div className="item" key={exercise.entryId || exercise.id}>
-          <span className="lrow-i"><Icon name="dumbbell" /></span>
-          <div className="grow">
-            <div className="tt">{exercise.name}</div>
-            <div className="ss">{coachExerciseLine(exercise, plan.unit)}</div>
-            {exercise.notes && <div className="small muted" style={{ marginTop: 4 }}>{exercise.notes}</div>}
+        <div className="blocklist" style={{ marginTop: 2 }}>{day.exercises.map(exercise => <div className="row between" key={exercise.entryId || exercise.id}>
+          <div className="grow" style={{ fontSize: 15, fontWeight: 600 }}>
+            {exercise.name}
+            {exercise.notes && <div style={{ fontSize: 13, color: 'var(--label-2)', marginTop: 2, fontWeight: 400 }}>{exercise.notes}</div>}
           </div>
+          <div style={{ fontSize: 14, fontWeight: 800, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{coachExerciseLine(exercise, plan.unit)}</div>
         </div>)}</div>
-      </div>)}
-    </div>
-
-    <h4 className="sec" style={{ marginTop: 22 }}>{t('Coach schedule')}</h4>
-    <div className="card">
-      {assigned.upcoming.length ? <div className="list">{assigned.upcoming.slice(0, 12).map(item => {
-        const label = item.state === 'started' ? t('In progress')
-          : item.customized && item.overrideDate ? t('Customized · Rescheduled')
-            : item.customized ? t('Customized')
-              : item.overrideDate ? t('Rescheduled')
-                : item.scheduledDate === assigned.relationshipDate ? t('Today') : t('Scheduled')
-        const statusKey = item.state === 'started' ? 'in-progress'
-          : item.customized ? 'customized'
-            : item.overrideDate ? 'rescheduled' : 'scheduled'
-        return <div className="item" key={item.id}>
-          <span className="lrow-i"><Icon name="calendar" /></span>
-          <div className="grow"><div className="tt">{item.prescription.dayName}</div><div className="ss">{fmtCoachDate(item.scheduledDate)} · {workspace.relationship.timeZone}</div></div>
-          <StatusBadge status={statusKey} label={label} />
+        <div className="row between" style={{ gap: 12, fontSize: 12, color: 'var(--label-3)', marginTop: 6 }}>
+          <span>{restNote}</span>
+          {nextDay && <span style={{ whiteSpace: 'nowrap' }}>{t('{0} below ↓', nextDay.name)}</span>}
         </div>
-      })}</div> : <EmptyState icon="calendar" description={t('No upcoming workouts are scheduled.')} />}
-    </div>
+      </div>
+    })}
+
+    <div className="eyebrow" style={{ margin: '22px 0 2px' }}>{t('Coach schedule')}</div>
+    {assigned.upcoming.length ? <div className="blocklist">{assigned.upcoming.slice(0, 12).map(item => {
+      const label = item.state === 'started' ? t('In progress')
+        : item.customized && item.overrideDate ? t('Customized · Rescheduled')
+          : item.customized ? t('Customized')
+            : item.overrideDate ? t('Rescheduled')
+              : item.scheduledDate === assigned.relationshipDate ? t('Today') : t('Scheduled')
+      const statusKey = item.state === 'started' ? 'in-progress'
+        : item.customized ? 'customized'
+          : item.overrideDate ? 'rescheduled' : 'scheduled'
+      return <div className="row between" key={item.id}>
+        <div className="grow"><div className="tt">{item.prescription.dayName}</div><div className="ss">{fmtCoachDate(item.scheduledDate)} · {workspace.relationship.timeZone}</div></div>
+        <StatusBadge status={statusKey} label={label} />
+      </div>
+    })}</div> : <div className="bcell"><EmptyState icon="calendar" description={t('No upcoming workouts are scheduled.')} /></div>}
     {assigned.canceled.length > 0 && <>
-      <h4 className="sec" style={{ marginTop: 22 }}>{t('Days off')}</h4>
-      <div className="card"><div className="list">{assigned.canceled.slice(0, 12).map(item => <div className="item" key={item.id}>
-        <span className="lrow-i" style={{ background: 'var(--surface-3)' }}><Icon name="xmark" /></span>
+      <div className="eyebrow" style={{ margin: '22px 0 2px' }}>{t('Days off')}</div>
+      <div className="blocklist">{assigned.canceled.slice(0, 12).map(item => <div className="row between" key={item.id}>
         <div className="grow"><div className="tt">{item.prescription.dayName}</div><div className="ss">{fmtCoachDate(item.scheduledDate)} · {workspace.relationship.timeZone}</div></div>
         <StatusBadge status="day-off" label={t('Day off')} />
-      </div>)}</div></div>
+      </div>)}</div>
     </>}
-  </div>
+  </>
 }
 
 function coachWeekday(value) {

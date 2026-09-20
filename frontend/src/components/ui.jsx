@@ -93,11 +93,12 @@ export function Switch({ checked, onChange, disabled }) {
 /* ============================ segmented ============================ */
 
 // options: [{ value, label, icon? }]  — the selected pill slides between cells.
+// Abutting equal-width blocks with an inverted-fill selection, per the 2a
+// direction — every range/filter picker in that design uses this same pattern
+// (Stats' window picker, Library's body-part filter, Settings' theme picker).
 export function Segmented({ options, value, onChange, className = '' }) {
-  const i = Math.max(0, options.findIndex(o => o.value === value))
   return (
-    <div className={'seg ' + className} style={{ '--n': options.length, '--i': i }}>
-      <span className="seg-sel" aria-hidden="true" />
+    <div className={'seg-block ' + className}>
       {options.map(o => (
         <button
           key={o.value}
@@ -215,6 +216,29 @@ export function Check({ checked, onChange, className = '', size }) {
 // The inset-grouped list is the app's main structural primitive: a titled
 // section holding rows separated by hairlines that stop short of the leading
 // edge, so the icon column reads as a continuous rail.
+// The brand row + "on device" badge + rule + big title that opens every
+// top-level screen in the 2a Blackprint Green direction (Home, Plan, Stats,
+// Exercises, ...). `onDeviceLabel` is passed already-translated so this stays
+// a plain layout component like the others here.
+export function ScreenHeader({ title, subtitle, onDeviceLabel, brand = 'transforma', action, className = '' }) {
+  return (
+    <div className={className}>
+      <div className="appbar">
+        <div>{brand}</div>
+        <div className="row" style={{ gap: 14 }}>
+          {onDeviceLabel && <div className="ondevice"><Icon name="shieldCheck" />{onDeviceLabel}</div>}
+          {action}
+        </div>
+      </div>
+      <hr className="rule2" />
+      <div className="screen-h">
+        <h1>{title}</h1>
+        {subtitle && <p>{subtitle}</p>}
+      </div>
+    </div>
+  )
+}
+
 export function Section({ title, footer, children, className = '' }) {
   return (
     <section className={'sect ' + className}>

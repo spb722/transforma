@@ -278,10 +278,15 @@ function ActiveWorkout() {
   }, [])
 
   return <div className="narrow">
-    <div className="hdr">
-      <button className="iconbtn" aria-label={assignedSession ? t('Back') : t('Discard')} onClick={assignedSession ? () => nav('/home') : () => confirmSheet({ title: t('Discard workout?'), message: t('The sets you logged in this session will be lost.'), confirmText: t('Discard'), danger: true, onConfirm: () => { update(s => { s.active = null }); stopRest(); nav('/home') } })}><Icon name={assignedSession ? 'chevronLeft' : 'xmark'} /></button>
-      <div style={{ textAlign: 'center' }}><div style={{ fontWeight: 600 }}>{A.name}</div><div className="sub">{assignedSession ? t('Coach assigned') + ' · ' : ''}<Elapsed start={A.start} /> · {t('{0} sets', done + '/' + total)}</div></div>
-      <button className="iconbtn" style={{ color: 'var(--acc)' }} aria-label={t('Finish')} onClick={finishWorkout}><Icon name="check" /></button>
+    <div className="row between" style={{ alignItems: 'center' }}>
+      <button className="iconbtn" style={{ width: 32, height: 32 }} aria-label={assignedSession ? t('Back') : t('Discard')} onClick={assignedSession ? () => nav('/home') : () => confirmSheet({ title: t('Discard workout?'), message: t('The sets you logged in this session will be lost.'), confirmText: t('Discard'), danger: true, onConfirm: () => { update(s => { s.active = null }); stopRest(); nav('/home') } })}><Icon name={assignedSession ? 'chevronLeft' : 'xmark'} /></button>
+      <div className="eyebrow eyebrow-trainer"><Icon name="dot" />{A.name}{assignedSession ? ' · ' + t('Coach assigned') : ''}</div>
+      <button className="iconbtn" style={{ width: 32, height: 32, color: 'var(--acc)' }} aria-label={t('Finish')} onClick={finishWorkout}><Icon name="check" /></button>
+    </div>
+    <hr className="rule2" style={{ margin: '10px 0 8px' }} />
+    <div className="row between" style={{ marginBottom: 6 }}>
+      <div className="eyebrow"><Elapsed start={A.start} /></div>
+      <div className="eyebrow">{t('{0} sets', done + '/' + total)}</div>
     </div>
     <div className="wprog"><i style={{ width: (total ? done / total * 100 : 0) + '%' }} /></div>
 

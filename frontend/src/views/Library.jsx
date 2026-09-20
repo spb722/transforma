@@ -7,7 +7,7 @@ import { t } from '../lib/i18n.js'
 import { Thumb } from '../components/Media.jsx'
 import { exerciseDetailSheet, addToRoutineSheet, customExSheet } from '../sheets.jsx'
 import Icon from '../components/Icon.jsx'
-import { Button, SearchField, EmptyState } from '../components/ui.jsx'
+import { Button, SearchField, EmptyState, ScreenHeader } from '../components/ui.jsx'
 
 export default function Library() {
   const S = useStore(s => s.S)
@@ -22,11 +22,11 @@ export default function Library() {
   const eqOn = eqOpts.includes(eq) ? eq : ''
   const f = eqOn ? base.filter(e => e.eq === eqOn) : base
 
-  return <>
-    <div className="hdr"><div><h1>{t('Exercises')}</h1><div className="sub">{t('{0} exercises with animations', EXDB.length)}</div></div></div>
+  return <div className="narrow">
+    <ScreenHeader title={t('Exercises')} subtitle={t('{0} exercises with animations', EXDB.length)} onDeviceLabel={t('On device')} />
     {/* was a one-off <svg>+<input> pair; the shared SearchField also gets a clear
         button for free, which this search bar previously had no way to trigger. */}
-    <div style={{ marginBottom: 10 }}>
+    <div style={{ margin: '22px 0 10px' }}>
       <SearchField placeholder={t('Search…')} value={q} onChange={e => { setQ(e.target.value); setShown(40) }} onClear={() => { setQ(''); setShown(40) }} />
     </div>
     <div className="chips" style={{ marginBottom: eqOpts.length > 1 ? 8 : 12 }}>
@@ -37,22 +37,24 @@ export default function Library() {
       <button className={'chip nocap' + (!eqOn ? ' on' : '')} onClick={() => { setEq(''); setShown(40) }}>{t('Any equipment')}</button>
       {eqOpts.map(x => <button key={x} className={'chip' + (eqOn === x ? ' on' : '')} onClick={() => { setEq(x); setShown(40) }}>{t(x)}</button>)}
     </div>}
-    <div className="list">
-      <div className="item" onClick={() => customExSheet(null, ex => exerciseDetailSheet(ex), q.trim())}>
+    <div className="blocklist">
+      {/* a plain div, not a button — the exercise row below nests a real <button>
+          ("Plan"), and a button can't legally contain another button */}
+      <div className="row between" style={{ cursor: 'pointer' }} onClick={() => customExSheet(null, ex => exerciseDetailSheet(ex), q.trim())}>
         <div className="thumb thumb-x"><Icon name="sparkles" /></div>
         <div className="grow"><div className="tt">{t('Create your own exercise')}</div><div className="ss">{t('name + body part, no animation')}</div></div><Icon name="plus" className="chev" />
       </div>
       {f.slice(0, shown).map(e => {
         const best = bestWeightFor(S, e.id)
-        return <div key={e.id} className="item" onClick={() => exerciseDetailSheet(e)}>
+        return <div key={e.id} className="row between" style={{ cursor: 'pointer' }} onClick={() => exerciseDetailSheet(e)}>
           <Thumb ex={e} />
           <div className="grow"><div className="tt capitalize">{e.n}</div><div className="ss capitalize">{t(e.tg || e.bp)} · {t(e.eq)}</div></div>
           {best > 0 && <span className="tag acc">{fmtNum(best)}</span>}
           <Button size="sm" variant="tinted" icon="plus" onClick={ev => { ev.stopPropagation(); addToRoutineSheet(e) }}>{t('Plan')}</Button>
         </div>
       })}
-      {f.length === 0 && <EmptyState icon="magnifier" description={t('No match')} />}
     </div>
+    {f.length === 0 && <div className="bcell" style={{ marginTop: 2 }}><EmptyState icon="magnifier" description={t('No match')} /></div>}
     {f.length > shown && <><div style={{ height: 10 }} /><Button onClick={() => setShown(s => s + 40)}>{t('Show more')}</Button></>}
-  </>
+  </div>
 }

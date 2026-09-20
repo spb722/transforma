@@ -255,11 +255,89 @@ h4.sec{
 }
 .card .big{font-size:30px;font-weight:600;letter-spacing:-.026em;line-height:1.1}
 
+/* -------------------------------------------------------- blockprint grid --
+   The "2a Blackprint Green" direction composes screens from solid-fill
+   blocks that touch edge-to-edge with a 2px gap standing in for the rule
+   between them, instead of separately-margined cards — `.bgrid`/`.blocklist`
+   below. `.eyebrow` is the small tracked all-caps label that introduces
+   almost every block in that direction. */
+/* 700 is the default weight (nav labels, tile captions); an eyebrow that carries
+   trainer-authority colour (inside `.trainer-block`, or `.eyebrow-trainer` on a
+   plain surface) steps up to 800 — matches the design's own split exactly. */
+.eyebrow{
+  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--label-3);display:flex;align-items:center;gap:6px;
+}
+.eyebrow-trainer{font-weight:800;color:var(--trainer-text)}
+.eyebrow .icn{font-size:14px;--icon-stroke:2}
+.rule2{height:var(--hair);background:var(--sep);margin:12px 0 18px;border:0}
+
+.appbar{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--label-3);
+}
+.appbar .ondevice{color:var(--trainer-text);display:flex;align-items:center;gap:6px;font-weight:800}
+.appbar .ondevice .icn{font-size:16px;--icon-stroke:2}
+
+.screen-h h1{font-size:36px;font-weight:800;line-height:1;letter-spacing:-.025em;margin:0}
+.screen-h p{font-size:15px;color:var(--label-3);margin:4px 0 0}
+
+.bgrid{display:grid;gap:2px}
+.bgrid-2{grid-template-columns:1fr 1fr}
+.bgrid-3{grid-template-columns:1fr 1fr 1fr}
+.bgrid-7{grid-template-columns:repeat(7,1fr)}
+.bcell{background:var(--surface);padding:16px}
+.bcell .eyebrow{margin-bottom:6px}
+.bcell .big{font-size:44px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.bcell .big .unit{font-size:18px;font-weight:700;color:var(--label-3)}
+.bcell .sub{font-size:13px;color:var(--label-3);margin-top:2px}
+/* the light-ground box used for the in-workout weight/reps stepper — always
+   the light ground regardless of ink/paper, since it's the "paper" fill on
+   the ink screen that Workout.jsx locks to dark theme */
+.bcell.inverted{background:var(--label);color:var(--bg)}
+.bcell.inverted .eyebrow{color:rgba(127,127,127,.8)}
+.bcell.on-fill{background:var(--trainer-fill);color:var(--trainer-on-fill)}
+.bcell.on-fill .eyebrow,.bcell.on-fill .sub{color:var(--trainer-on-fill);opacity:.85}
+
+.blocklist{display:flex;flex-direction:column;gap:2px}
+.blocklist>*{background:var(--surface);padding:12px 14px}
+
+/* trainer-authored content: a full-bleed fill, not a bordered card, per
+   research.md §1a — reserved for the primary action and anything the
+   trainer authored. */
+.trainer-block{background:var(--trainer-fill);color:var(--trainer-on-fill);padding:18px 18px 20px}
+.trainer-block .eyebrow{color:var(--trainer-on-fill);opacity:.92;font-weight:800}
+.trainer-block h2{font-size:40px;font-weight:800;line-height:1;letter-spacing:-.03em;margin:10px 0 0}
+.trainer-block .meta{font-size:14px;margin-top:10px;opacity:.9}
+.trainer-cta{
+  margin-top:16px;background:var(--trainer-on-fill);color:var(--trainer-fill);
+  font-weight:800;font-size:15px;padding:14px;min-height:48px;box-sizing:border-box;
+  display:flex;align-items:center;justify-content:space-between;width:100%;border:0;
+}
+
+/* segmented control as abutting blocks, selected = inverted fill — replaces
+   the pill-shaped `.chip` treatment for range/filter pickers in this
+   direction. */
+.seg-block{display:flex;gap:2px}
+.seg-block>button{
+  flex:1;background:var(--surface);color:var(--label-2);border:0;
+  display:flex;align-items:center;justify-content:center;gap:5px;min-height:30px;
+  padding:10px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  transition:background var(--fast),color var(--fast);
+}
+.seg-block>button .icn{font-size:14px}
+.seg-block>button.on{background:var(--label);color:var(--bg);font-weight:800}
+/* sitting in a list row: shrink to content instead of filling the row */
+.seg-inline{flex:none;min-width:132px}
+.seg-range{margin-bottom:10px}
+.seg-inline>button{padding:6px 10px;font-size:11px}
+
 /* ------------------------------------------------------ inset group list -- */
 .sect{margin-bottom:22px}
 .sect-t{
-  font-size:13px;font-weight:400;color:var(--label-2);
-  letter-spacing:-.004em;padding:0 4px 7px;display:block;
+  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--label-3);padding:0 4px 8px;display:block;
 }
 .sect-b{background:var(--surface);border-radius:var(--r-card);overflow:hidden}
 .sect-f{font-size:13px;color:var(--label-2);padding:7px 4px 0;line-height:1.38}
@@ -276,7 +354,7 @@ h4.sec{
 .lrow:has(.lrow-i)+.lrow:has(.lrow-i)::before{left:55px}
 .lrow.tap:active{background:var(--surface-2)}
 .lrow-i{
-  width:29px;height:29px;border-radius:7px;flex:none;font-size:18px;
+  width:29px;height:29px;border-radius:var(--r-sm);flex:none;font-size:18px;
   display:flex;align-items:center;justify-content:center;
   background:var(--tint,var(--acc));color:#fff;
 }
@@ -316,54 +394,49 @@ h4.sec{
 .btn.ghost:active,.btn.plain:active{background:var(--surface-2)}
 .btn.sm{padding:8px 14px;width:auto;font-size:15px;border-radius:var(--r-sm);gap:5px}
 .btn.sm .icn{font-size:16px}
-.btn.xs{padding:5px 10px;width:auto;font-size:13px;border-radius:7px;gap:4px}
+.btn.xs{padding:5px 10px;width:auto;font-size:13px;border-radius:var(--r-sm);gap:4px}
 .btn:disabled{opacity:.32;pointer-events:none}
 
 /* ----------------------------------------------------------- tab bar ----- */
+/* Flat, equal-weight bar per the 2a Blackprint Green direction — no raised
+   circular action button; the active tab is marked by a top accent border
+   instead, same idea as the design's own `border-top:4px solid` treatment. */
 #tabbar{
   position:fixed;left:0;right:0;bottom:0;z-index:50;
-  display:flex;justify-content:space-around;align-items:flex-end;
-  padding:7px 6px calc(6px + var(--sab));
-  background:color-mix(in srgb,var(--bg-el) 72%,transparent);
-  backdrop-filter:saturate(180%) blur(24px);-webkit-backdrop-filter:saturate(180%) blur(24px);
-  border-top:var(--hair) solid var(--sep-op);
+  display:grid;grid-template-columns:repeat(5,1fr);
+  padding:0 0 var(--sab);
+  background:var(--bg);color:var(--label);
+  border-top:var(--hair) solid var(--sep);
 }
-:root[data-theme="light"] #tabbar{background:rgba(249,249,251,.78)}
 #tabbar button{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
-  color:var(--label-3);font-size:10px;font-weight:500;letter-spacing:.005em;padding-top:3px;
-  transition:color var(--fast);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  color:var(--label-3);font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  padding:12px 0 10px;border-top:4px solid transparent;margin-top:-4px;
+  transition:color var(--fast),border-color var(--fast);
 }
-/* The inactive tint is semi-transparent, so wherever two strokes cross inside an
-   icon (the calendar's hangers over its frame, the divider's caps on its sides)
-   the alpha doubled up and the icon read as a stack of loose layers. Carrying the
-   fade on the <svg> instead of in the stroke colour flattens the icon first and
-   fades it as one shape — and it does that for every icon, not just this one. */
-#tabbar button .icn{font-size:25px;--icon-stroke:1.65;color:var(--label)}
-#tabbar button.on{color:var(--acc)}
-#tabbar button.on .icn{--icon-stroke:2;color:inherit;opacity:1}
-#tabbar button.start{margin-top:-24px}
-#tabbar button.start .cir{
-  width:52px;height:52px;border-radius:50%;background:var(--acc);color:var(--on-acc);
-  display:flex;align-items:center;justify-content:center;position:relative;
-  box-shadow:0 6px 18px -4px color-mix(in srgb,var(--acc) 55%,transparent);
-  transition:transform var(--fast) var(--ease);
+#tabbar button .icn{font-size:20px;--icon-stroke:1.65;color:inherit}
+#tabbar button.on{color:var(--acc);font-weight:800;border-top-color:var(--acc)}
+#tabbar button.on .icn{--icon-stroke:2;opacity:1}
+#tabbar button.start.rec{color:var(--orange);border-top-color:var(--orange)}
+
+/* ----------------------------------------------------- day strip (2a) -- */
+/* One `.bgrid.bgrid-7` of these — a day's plan reads as a short word
+   (`.daylabel`), not just a coloured dot, per the 2a direction. */
+.daycell{
+  background:var(--surface);padding:8px 0;display:flex;flex-direction:column;
+  align-items:center;gap:2px;border:0;color:var(--label-3);
 }
-#tabbar button.start:active .cir{transform:scale(.93)}
-#tabbar button.start .cir .icn{font-size:26px;--icon-stroke:2;color:inherit;opacity:1}
-#tabbar button.start span{color:var(--acc);font-weight:600}
-/* `.cir` is itself a <span>, so the label rules above and below reach it too and
-   outrank the `.cir` block — which is how the running state ended up painting an
-   orange play glyph onto an orange disc. Both states restate their own colour.
-   The disc is orange in either theme, so its glyph is black, not `--on-acc`. */
-#tabbar button.start .cir{color:var(--on-acc)}
-#tabbar button.start.rec .cir{background:var(--orange);color:#000;box-shadow:0 6px 18px -4px color-mix(in srgb,var(--orange) 55%,transparent)}
-#tabbar button.start.rec span{color:var(--orange)}
-#tabbar button.start.rec .cir::after{
-  content:'';position:absolute;inset:0;border-radius:50%;
-  border:2px solid var(--orange);animation:ping 1.9s var(--ease) infinite;
-}
-@keyframes ping{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.45);opacity:0}}
+.daycell .lbl{font-size:10px;letter-spacing:.08em;font-weight:700;text-transform:uppercase}
+.daycell .num{font-size:18px;font-weight:700;color:var(--label);margin:1px 0;font-variant-numeric:tabular-nums}
+.daycell .daylabel{font-size:9px;letter-spacing:.06em;font-weight:800;text-transform:uppercase;color:var(--label-4)}
+.daycell.today{background:var(--label);color:var(--bg)}
+.daycell.today .lbl{color:rgba(127,127,127,.7)}
+.daycell.today .num{color:var(--bg);font-weight:800}
+.daycell.today .daylabel{color:var(--trainer-fill)}
+.daycell.has-plan .daylabel,.daycell.has-done .daylabel{color:var(--trainer-text)}
+.daycell.has-ovr .daylabel{color:var(--orange)}
+.daycell.selected:not(.today){background:var(--surface-2)}
+.daycell.selected:not(.today) .num{color:var(--acc)}
 
 /* ------------------------------------------------------------ week strip -- */
 .week{display:flex;justify-content:space-between;gap:4px}
@@ -405,7 +478,7 @@ h4.sec{
 .chev{color:var(--label);flex:none;font-size:15px;--icon-stroke:2.4}
 .tag{
   display:inline-flex;align-items:center;gap:3px;background:var(--surface-2);
-  color:var(--label-2);border-radius:6px;padding:3px 7px;font-size:12px;
+  color:var(--label-2);border-radius:var(--r-sm);padding:3px 7px;font-size:12px;
   font-weight:500;text-transform:capitalize;
 }
 .tag.acc{background:var(--acc-soft);color:var(--acc)}
@@ -417,12 +490,14 @@ h4.sec{
 }
 .chips::-webkit-scrollbar{display:none}
 .chip{
-  flex:none;padding:6px 13px;border-radius:99px;background:var(--surface);
+  flex:none;padding:6px 13px;border-radius:var(--r-sm);background:var(--surface);
   font-size:14px;font-weight:400;color:var(--label);text-transform:capitalize;
   letter-spacing:-.006em;transition:background var(--fast),color var(--fast);
 }
 .chip:active{background:var(--surface-2)}
-.chip.on{background:var(--acc);color:var(--on-acc);font-weight:500}
+/* Inverted fill, same selection language as `.seg-block`/today's day cell —
+   chip selection is a plain filter/choice state, not the personal accent. */
+.chip.on{background:var(--label);color:var(--bg);font-weight:800}
 
 /* -------------------------------------------------------- status badge -- */
 /* Border + tinted text, not a filled block — the redesign reserves solid
@@ -553,35 +628,6 @@ h4.sec{
    into a grid area, so the sliding thumb resolved top/bottom against the wrong
    box and overflowed the track. A flex container leaves abspos children on the
    padding box, which is what the thumb needs. */
-.seg{
-  position:relative;display:flex;
-  background:var(--surface-3);border-radius:9px;padding:2px;isolation:isolate;
-}
-.seg>button{flex:1 1 0;min-width:0}
-:root[data-theme="light"] .seg{background:rgba(118,118,128,.12)}
-.seg-sel{
-  position:absolute;z-index:0;top:2px;bottom:2px;left:2px;
-  width:calc((100% - 4px)/var(--n));
-  transform:translateX(calc(100% * var(--i)));
-  background:var(--surface);border-radius:7px;
-  box-shadow:0 3px 8px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.06);
-  transition:transform var(--med) var(--ease);
-}
-:root[data-theme="light"] .seg-sel{background:#fff}
-.seg button{
-  position:relative;z-index:1;padding:6px 8px;font-size:14px;font-weight:500;
-  letter-spacing:-.006em;color:var(--label);display:flex;align-items:center;
-  justify-content:center;gap:5px;min-height:30px;transition:opacity var(--fast);
-}
-.seg button .icn{font-size:16px}
-.seg button:not(.on){color:var(--label-2);font-weight:400}
-.seg button:active{opacity:.5}
-/* sitting in a list row: shrink to content instead of filling the row */
-.seg-inline{flex:none;min-width:132px}
-.seg-range{margin-bottom:10px}
-.seg-inline button{padding:5px 10px;font-size:13px;min-height:28px}
-.seg-inline button .icn{font-size:14px}
-
 /* native time input, restyled to sit in a row like a value label */
 .timef{
   background:var(--surface-2);border:none;border-radius:8px;padding:6px 10px;
@@ -598,7 +644,7 @@ h4.sec{
 .stp-l{font-size:13px;color:var(--label-2);text-align:center}
 .stp{
   display:flex;align-items:center;background:var(--surface-2);
-  border-radius:10px;overflow:hidden;min-width:0;
+  border-radius:var(--r-sm);overflow:hidden;min-width:0;
 }
 .stp button{
   width:40px;height:44px;flex:none;color:var(--label);font-size:16px;
@@ -653,8 +699,8 @@ h4.sec{
 .ck.on svg{stroke:var(--on-acc)}
 
 /* ------------------------------------------------------------- workout --- */
-.wprog{height:4px;background:var(--surface-2);border-radius:99px;overflow:hidden;margin-bottom:16px}
-.wprog i{display:block;height:100%;background:var(--acc);border-radius:99px;transition:width var(--med) var(--ease)}
+.wprog{height:4px;background:var(--surface-2);overflow:hidden;margin-bottom:16px}
+.wprog i{display:block;height:100%;background:var(--acc);transition:width var(--med) var(--ease)}
 .exmedia{position:relative;border-radius:var(--r-lg);overflow:hidden;background:#fff;margin-bottom:12px}
 .exmedia img{width:100%;height:320px;object-fit:contain;display:block}
 .exmedia .gifhint,.exmedia .giftoggle{
@@ -744,7 +790,7 @@ h4.sec{
 }
 @keyframes slideup{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
 #timer .t{font-size:26px;font-weight:600;letter-spacing:-.026em;font-variant-numeric:tabular-nums;min-width:66px}
-#timer .bar{flex:1;height:4px;background:var(--surface-3);border-radius:99px;overflow:hidden}
+#timer .bar{flex:1;height:4px;background:var(--surface-3);overflow:hidden}
 #timer .bar i{display:block;height:100%;background:var(--acc);transition:width 1s linear}
 /* rest variant: −15/+15/Skip and the clock won't share one line on a phone, so the clock and
    bar take the top row and the controls take their own. The work timer keeps a single row —
@@ -947,7 +993,7 @@ h4.sec{
   bottom:calc(96px + var(--sab));z-index:200;
   background:color-mix(in srgb,var(--surface-2) 88%,transparent);
   backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
-  border-radius:99px;padding:11px 20px;font-size:15px;font-weight:500;
+  border-radius:var(--r-sm);padding:11px 20px;font-size:15px;font-weight:500;
   box-shadow:0 10px 30px -6px rgba(0,0,0,.5);
   opacity:0;pointer-events:none;transition:opacity var(--med),transform var(--med) var(--ease);
   max-width:88vw;text-align:center;
@@ -983,9 +1029,9 @@ h4.sec{
 
 /* --- accent swatches --- */
 .swatches{display:flex;gap:12px;flex-wrap:wrap}
-.swatch{width:32px;height:32px;border-radius:50%;flex:none;position:relative;transition:transform var(--fast)}
+.swatch{width:32px;height:32px;flex:none;position:relative;transition:transform var(--fast)}
 .swatch:active{transform:scale(.9)}
-.swatch.on::after{content:'';position:absolute;inset:-4px;border-radius:50%;box-shadow:0 0 0 2px var(--label)}
+.swatch.on::after{content:'';position:absolute;inset:-4px;box-shadow:0 0 0 2px var(--label)}
 
 /* --- supersets --- */
 .ss-label{

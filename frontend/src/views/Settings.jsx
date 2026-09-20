@@ -74,10 +74,12 @@ export default function Settings() {
   })
 
   return <div className="narrow">
-    <div className="hdr">
-      <button className="iconbtn" onClick={() => nav('/home')} aria-label={t('Home')}><Icon name="chevronLeft" /></button>
-      <div style={{ flex: 1, marginLeft: 10 }}><h1>{t('Settings')}</h1></div>
+    <button className="eyebrow" style={{ minHeight: 32, marginBottom: 18 }} onClick={() => nav('/home')}><Icon name="chevronLeft" />{t('Home')}</button>
+    <div className="screen-h">
+      <h1>{t('Settings')}</h1>
+      <p>{user ? user.name + ' · ' + t('account') : DEMO ? t('demo account') : t('guest')}</p>
     </div>
+    <div style={{ height: 18 }} />
 
     {/* ---------- account (demo and mobile builds have nothing to sign in to) ---------- */}
     <Section title={MOBILE ? t('Your data') : DEMO ? t('Demo') : t('Account')}>

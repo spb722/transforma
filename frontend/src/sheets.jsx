@@ -880,11 +880,11 @@ function FinishSummary({ w, prs, e1prs = [], close }) {
   return <div style={{ textAlign: 'center', padding: '8px 0' }}>
     <div style={{ fontSize: 44, display: 'flex', justifyContent: 'center', color: 'var(--acc)' }}><Icon name="trophy" /></div>
     <h3 style={{ margin: '8px 0' }}>{t('Workout complete!')}</h3>
-    <div className="tiles" style={{ textAlign: 'left' }}>
-      <div className="tile"><div className="l">{t('Duration')}</div><div className="v" style={{ fontSize: '1.1rem' }}>{fmtDur(w.end - w.start)}</div></div>
-      <div className="tile"><div className="l">{t('Volume')}</div><div className="v" style={{ fontSize: '1.1rem' }}>{fmtVol(w.vol, displayUnit)}</div></div>
-      <div className="tile"><div className="l">{t('Sets')}</div><div className="v" style={{ fontSize: '1.1rem' }}>{setsDone(w)}</div></div>
-      <div className="tile"><div className="l">{t('PRs')}</div><div className="v" style={{ fontSize: 20 }}>{prs.length || '—'}</div></div>
+    <div className="bgrid bgrid-2" style={{ textAlign: 'left' }}>
+      <div className="bcell"><div className="eyebrow">{t('Duration')}</div><div className="big" style={{ fontSize: 22 }}>{fmtDur(w.end - w.start)}</div></div>
+      <div className="bcell"><div className="eyebrow">{t('Volume')}</div><div className="big" style={{ fontSize: 22 }}>{fmtVol(w.vol, displayUnit)}</div></div>
+      <div className="bcell"><div className="eyebrow">{t('Sets')}</div><div className="big" style={{ fontSize: 22 }}>{setsDone(w)}</div></div>
+      <div className="bcell"><div className="eyebrow">{t('PRs')}</div><div className="big" style={{ fontSize: 22, color: prs.length ? 'var(--trainer-text)' : undefined }}>{prs.length || '—'}</div></div>
     </div>
     {(prs.length > 0 || e1prs.length > 0) && <div style={{ textAlign: 'left', marginBottom: 12 }}>
       {prs.map(id => <div key={id} className="small accent capitalize row" style={{ gap: 5 }}><Icon name="trophy" style={{ fontSize: 13 }} />{t('New PR:')} {(EXIDX[id] || {}).n || id}</div>)}
