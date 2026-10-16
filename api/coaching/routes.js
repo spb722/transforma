@@ -16,12 +16,19 @@ function limiter({ max, windowMs }) {
   };
 }
 
-export function relationshipHandlers({ store, profiles, invitations, relationships, workspaces, templates, plans, occurrences, sessions, checkIns, progress, history, fees, config }) {
+export function relationshipHandlers({ store, profiles, invitations, relationships, workspaces, templates, plans, occurrences, sessions, sessionFeedback, contacts, checkIns, progress, history, fees, config }) {
   const limitPreview = limiter({ max: 30, windowMs: 60_000 });
   const relationship = (user, relationshipId, permission) => authorizeRelationship(user, store.db.prepare('SELECT * FROM client_relationships WHERE id=?').get(relationshipId), permission);
   const occurrenceRelationship = (user, occurrenceId) => {
     const row = store.db.prepare('SELECT r.* FROM workout_occurrences o JOIN client_relationships r ON r.id=o.relationship_id WHERE o.id=?').get(occurrenceId);
     return authorizeRelationship(user, row, 'write-trainer');
+  };
+  const currentOccurrenceReplay = (user, occurrenceId) => receipt => {
+    occurrenceRelationship(user, occurrenceId);
+    const current = store.db.prepare('SELECT version FROM workout_occurrences WHERE id=?').get(occurrenceId);
+    const saved = JSON.parse(receipt.response_json);
+    if (!current || current.version !== saved.version) throw new HttpError(409, 'VERSION_CONFLICT', 'Reload this occurrence before changing it');
+    return true;
   };
   const checkInRelationship = (user, checkInId) => {
     const row = store.db.prepare('SELECT r.* FROM weekly_check_ins c JOIN client_relationships r ON r.id=c.relationship_id WHERE c.id=?').get(checkInId);
@@ -41,32 +48,45 @@ export function relationshipHandlers({ store, profiles, invitations, relationshi
       return { created: true, data: { ...invitation, shareUrl: `${config.origin}/#/join/${invitation.token}` } };
     },
     'GET /api/coaching/invitations': ({ user }) => ({ items: invitations.list(requireUser(user).id), nextCursor: null }),
-    'POST /api/coaching/invitations/preview': ({ req, body }) => {
+    'POST /api/coaching/invitations/preview': ({ req, user, body }) => {
       const ip = req.socket?.remoteAddress || 'unknown';
       limitPreview(ip);
-      return invitations.preview(body.token);
+      return invitations.preview(body.token, user?.id);
     },
     'POST /api/coaching/invitations/revoke': ({ user, body }) => { user=requireTrainer(requireUser(user),config.trainerIds);return mutate(user,body,'invitation.revoke',()=>invitations.revoke(user.id,body.invitationId),()=>!!store.db.prepare('SELECT id FROM invitations WHERE id=? AND trainer_id=?').get(body.invitationId,user.id)); },
     'POST /api/coaching/invitations/accept': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'invitation.accept',()=>invitations.accept(body.token,user.id,body)); },
     'POST /api/coaching/relationships/end': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'relationship.end',()=>relationships.end(user,body.relationshipId,body.expectedVersion)); },
     'GET /api/coaching/overview': ({ user }) => workspaces.overview(requireUser(user)),
+    'GET /api/coaching/contact': ({ user, url }) => contacts.get(requireUser(user),url.searchParams.get('relationshipId')),
+    'POST /api/coaching/contact/preference': ({ user, body }) => contacts.savePreference(requireUser(user),body.relationshipId,body),
+    'POST /api/coaching/contact/confirm': ({ user, body }) => contacts.confirm(requireTrainer(requireUser(user),config.trainerIds),body.relationshipId,body),
     'GET /api/coaching/workspace': ({ user, url }) => workspaces.get(requireUser(user), url.searchParams.get('relationshipId')),
     'GET /api/coaching/templates': ({ user, url }) => templates.list(requireTrainer(requireUser(user),config.trainerIds).id, url.searchParams.get('kind')),
     'GET /api/coaching/plan-sources': ({ user, url }) => plans.sources(requireTrainer(requireUser(user),config.trainerIds).id, { kind: url.searchParams.get('kind') || 'workout', limit: url.searchParams.get('limit') }),
     'POST /api/coaching/templates': ({ user, body }) => { user=requireTrainer(requireUser(user),config.trainerIds);return mutate(user,body,'template.create',()=>templates.create(user.id,body),receipt=>!!store.db.prepare('SELECT id FROM plan_templates WHERE id=? AND trainer_id=?').get(receipt.resource_id,user.id)); },
     'PUT /api/coaching/templates': ({ user, body }) => { user=requireTrainer(requireUser(user),config.trainerIds);return mutate(user,body,'template.update',()=>templates.update(user.id,body),()=>!!store.db.prepare('SELECT id FROM plan_templates WHERE id=? AND trainer_id=?').get(body.templateId,user.id)); },
     'POST /api/coaching/plans/publish': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'plan.publish',()=>plans.publish(user.id,body),()=>relationship(user,body.relationshipId,'write-trainer')); },
-    'POST /api/coaching/occurrences/move': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'occurrence.move',()=>occurrences.move(user,body.occurrenceId,body.expectedVersion,body.scheduledDate),()=>occurrenceRelationship(user,body.occurrenceId)); },
-    'POST /api/coaching/occurrences/reset': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'occurrence.reset',()=>occurrences.reset(user,body.occurrenceId,body.expectedVersion),()=>occurrenceRelationship(user,body.occurrenceId)); },
-    'POST /api/coaching/occurrences/customize': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'occurrence.customize',()=>occurrences.customize(user,body.occurrenceId,body.expectedVersion,body.prescription),()=>occurrenceRelationship(user,body.occurrenceId)); },
-    'POST /api/coaching/occurrences/cancel': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'occurrence.cancel',()=>occurrences.cancel(user,body.occurrenceId,body.expectedVersion),()=>occurrenceRelationship(user,body.occurrenceId)); },
-    'POST /api/coaching/occurrences/restore': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'occurrence.restore',()=>occurrences.restore(user,body.occurrenceId,body.expectedVersion,body.scheduledDate),()=>occurrenceRelationship(user,body.occurrenceId)); },
+    'POST /api/coaching/plans/remove': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'plan.remove',()=>plans.remove(user.id,body),()=>relationship(user,body.relationshipId,'write-trainer')); },
+    'POST /api/coaching/occurrences/create': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'occurrence.create',()=>occurrences.create(user,body),receipt=>currentOccurrenceReplay(user,receipt.resource_id)(receipt)); },
+    'POST /api/coaching/occurrences/move': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'occurrence.move',()=>occurrences.move(user,body.occurrenceId,body.expectedVersion,body.scheduledDate),currentOccurrenceReplay(user,body.occurrenceId)); },
+    'POST /api/coaching/occurrences/reset': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'occurrence.reset',()=>occurrences.reset(user,body.occurrenceId,body.expectedVersion),currentOccurrenceReplay(user,body.occurrenceId)); },
+    'POST /api/coaching/occurrences/customize': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'occurrence.customize',()=>occurrences.customize(user,body.occurrenceId,body.expectedVersion,body.prescription),currentOccurrenceReplay(user,body.occurrenceId)); },
+    'POST /api/coaching/occurrences/cancel': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'occurrence.cancel',()=>occurrences.cancel(user,body.occurrenceId,body.expectedVersion),currentOccurrenceReplay(user,body.occurrenceId)); },
+    'POST /api/coaching/occurrences/restore': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'occurrence.restore',()=>occurrences.restore(user,body.occurrenceId,body.expectedVersion,body.scheduledDate),currentOccurrenceReplay(user,body.occurrenceId)); },
     'POST /api/coaching/sessions/start': ({ user, body }) => sessions.start(requireUser(user),body),
     'PUT /api/coaching/sessions/result': ({ user, body }) => sessions.finish(requireUser(user),body),
+    'GET /api/coaching/sessions/feedback': ({ user, url }) => sessionFeedback.get(requireUser(user),url.searchParams.get('sessionId')),
+    'PUT /api/coaching/sessions/feedback': ({ user, body }) => sessionFeedback.save(requireUser(user),body.sessionId,body),
+    'POST /api/coaching/sessions/feedback/review': ({ user, body }) => sessionFeedback.review(requireUser(user),body.sessionId,body),
     'GET /api/coaching/sessions': ({ user, url }) => sessions.list(requireUser(user),url.searchParams.get('relationshipId')),
+    'GET /api/coaching/check-ins': ({ user, url }) => checkIns.list(requireUser(user), url.searchParams.get('relationshipId')),
     'PUT /api/coaching/check-ins': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'check-in.save',()=>checkIns.save(user,body),()=>relationship(user,body.relationshipId,'write-client')); },
     'PUT /api/coaching/check-ins/response': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'check-in.respond',()=>checkIns.respond(user,body),()=>checkInRelationship(user,body.checkInId)); },
-    'GET /api/coaching/progress': ({ user, url }) => { const range=dateRange(url.searchParams.get('from'),url.searchParams.get('to')); return progress.get(requireUser(user),url.searchParams.get('relationshipId'),range.from,range.to); },
+    'GET /api/coaching/progress': ({ user, url }) => {
+      const weeks = url.searchParams.get('weeks');
+      const range = weeks === null ? dateRange(url.searchParams.get('from'), url.searchParams.get('to')) : {};
+      return progress.get(requireUser(user), url.searchParams.get('relationshipId'), range.from, range.to, weeks);
+    },
     'GET /api/coaching/history': ({ user, url }) => { const range=dateRange(url.searchParams.get('from'),url.searchParams.get('to')); return history.list(requireUser(user),url.searchParams.get('relationshipId'),range.from,range.to); },
     'GET /api/coaching/fees': ({ user, url }) => fees.list(requireUser(user),url.searchParams.get('relationshipId')),
     'POST /api/coaching/fees': ({ user, body }) => { user=requireUser(user);return mutate(user,body,'fee.create',()=>fees.create(user,body),()=>relationship(user,body.relationshipId,'write-trainer')); },

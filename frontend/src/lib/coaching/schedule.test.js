@@ -44,3 +44,48 @@ describe('own coaching schedule projection', () => {
     expect(occurrenceOnDate(workspace, '2026-09-14')?.state).toBe('canceled')
   })
 })
+
+
+describe('standalone one-time assignments', () => {
+  it('shows and starts an assigned date even without a recurring plan', () => {
+    const oneTime = { id: 'once', oneTime: true, state: 'scheduled', scheduledDate: '2026-10-02' }
+    const workspace = { relationship: { status: 'active', timeZone: 'Pacific/Kiritimati' }, workout: null, occurrences: [oneTime] }
+    expect(hasActiveCoachPlan(workspace, new Date('2026-10-01T12:00:00Z'))).toBe(true)
+    const result = ownAssignmentSchedule(workspace, new Date('2026-10-01T12:00:00Z'))
+    expect(result.today).toEqual(oneTime)
+    expect(result.upcoming).toEqual([oneTime])
+    expect(occurrenceOnDate(workspace, '2026-10-02')).toEqual(oneTime)
+    expect(occurrenceOnDate(workspace, '2026-10-09')).toBeNull()
+  })
+
+  it('does not activate coaching for an ended one-time assignment', () => {
+    const workspace = { relationship: { status: 'ended', timeZone: 'UTC' }, workout: null, occurrences: [{ id: 'once', state: 'scheduled', scheduledDate: '2026-10-01' }] }
+    expect(hasActiveCoachPlan(workspace)).toBe(false)
+    expect(ownAssignmentSchedule(workspace, new Date('2026-10-01T12:00:00Z')).today).toBeNull()
+  })
+})
+
+it('does not offer Resume for an abandoned attempt whose occurrence remains locked', () => {
+  const row = { id: 'abandoned', scheduledDate: '2026-10-02', state: 'started', displayState: 'abandoned' }
+  const workspace = { relationship: { status: 'active', timeZone: 'UTC' }, occurrences: [row] }
+  const result = ownAssignmentSchedule(workspace, new Date('2026-10-02T12:00:00Z'))
+  expect(result.today).toBeNull()
+  expect(result.todayStatus).toBe(row)
+  expect(result.upcoming).toEqual([])
+})
+
+
+it('releases personal mode after standalone work ends while retaining history and days off', () => {
+  const now = new Date('2026-10-02T12:00:00Z')
+  const workspace = { relationship: { status: 'active', timeZone: 'UTC' }, occurrences: [
+    { id: 'done', state: 'completed', scheduledDate: '2026-10-01' },
+    { id: 'missed', state: 'scheduled', scheduledDate: '2026-10-01' },
+    { id: 'abandoned', state: 'started', displayState: 'abandoned', scheduledDate: '2026-10-02' },
+    { id: 'off', state: 'canceled', cancellationReason: 'explicit', scheduledDate: '2026-10-03' }
+  ] }
+  expect(hasActiveCoachPlan(workspace, now)).toBe(false)
+  expect(ownAssignmentSchedule(workspace, now).past.map(row => row.id)).toEqual(['missed', 'done'])
+  expect(ownAssignmentSchedule(workspace, now).canceled.map(row => row.id)).toEqual(['off'])
+  workspace.occurrences.push({ id: 'pending', state: 'started', scheduledDate: '2026-10-01' })
+  expect(hasActiveCoachPlan(workspace, now)).toBe(true)
+})

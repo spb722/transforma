@@ -4,6 +4,8 @@ import { HttpError, expectedVersion } from './validation.js';
 const finite = value => typeof value === 'number' && Number.isFinite(value) && value >= 0;
 export function validateWorkoutContent(value) {
   if (!value || typeof value !== 'object' || !['kg', 'lb'].includes(value.unit) || !Array.isArray(value.days) || value.days.length < 1 || value.days.length > 14) throw new HttpError(422, 'VALIDATION_ERROR', 'Add at least one valid training day');
+  const name = String(value.name || '').trim();
+  if (!name || name.length > 100) throw new HttpError(422, 'VALIDATION_ERROR', 'Plan name must contain 1–100 characters', { name: 'required, maximum 100 characters' });
   const dayIds = new Set(); const claimedWeekdays = new Set();
   const days = value.days.map((day, dayIndex) => {
     if (!day?.id || dayIds.has(day.id) || !Array.isArray(day.weekdays) || !day.weekdays.length || day.weekdays.some(n => !Number.isInteger(n) || n < 1 || n > 7)) throw new HttpError(422, 'VALIDATION_ERROR', `Training day ${dayIndex + 1} is invalid`);
@@ -11,11 +13,14 @@ export function validateWorkoutContent(value) {
       if (claimedWeekdays.has(weekday)) throw new HttpError(422, 'VALIDATION_ERROR', 'Each weekday can belong to only one training day');
       claimedWeekdays.add(weekday);
     }
+    const dayName = String(day.name || '').trim();
+    if (!dayName || dayName.length > 100) throw new HttpError(422, 'VALIDATION_ERROR', `Training day ${dayIndex + 1} needs a name of 1–100 characters`);
+    if (!Array.isArray(day.exercises) || !day.exercises.length) throw new HttpError(422, 'VALIDATION_ERROR', `Add at least one exercise to training day ${dayIndex + 1}`);
     dayIds.add(day.id); const entryIds = new Set();
     const exercises = (day.exercises || []).map((exercise, exerciseIndex) => {
       const entryId = String(exercise?.entryId || exercise?.id || '');
       const exerciseId = String(exercise?.exerciseId || exercise?.id || '');
-      if (!entryId || !exerciseId || entryIds.has(entryId) || !String(exercise.name || '').trim() || !['reps','time','cardio'].includes(exercise.mode) || !Array.isArray(exercise.sets)) throw new HttpError(422, 'VALIDATION_ERROR', `Exercise ${exerciseIndex + 1} is invalid`);
+      if (!entryId || !exerciseId || entryIds.has(entryId) || !String(exercise.name || '').trim() || !['reps','time','cardio'].includes(exercise.mode) || !Array.isArray(exercise.sets) || exercise.sets.length < 1 || exercise.sets.length > 20) throw new HttpError(422, 'VALIDATION_ERROR', `Exercise ${exerciseIndex + 1} needs a name and 1–20 valid sets`);
       entryIds.add(entryId);
       const sets = exercise.sets.map(set => {
         if (!set || Object.values(set).some(item => typeof item === 'number' && !finite(item))) throw new HttpError(422, 'VALIDATION_ERROR', 'Targets must be finite and nonnegative');
@@ -30,9 +35,9 @@ export function validateWorkoutContent(value) {
       } : undefined;
       return { entryId, exerciseId, name: String(exercise.name).trim().slice(0, 100), mode: exercise.mode, sets, restSec: finite(exercise.restSec || 0) ? exercise.restSec || 0 : 0, notes: String(exercise.notes || '').slice(0, 500), ...(custom ? { custom } : {}) };
     });
-    return { id: String(day.id), name: String(day.name || `Day ${dayIndex + 1}`).trim().slice(0, 100), weekdays: [...new Set(day.weekdays)].sort(), exercises };
+    return { id: String(day.id), name: dayName, weekdays: [...new Set(day.weekdays)].sort(), exercises };
   });
-  return { name: String(value.name || 'Workout plan').trim().slice(0, 100), unit: value.unit, days };
+  return { name, unit: value.unit, days };
 }
 
 export function validateWorkoutPrescription(value, base) {
@@ -46,7 +51,7 @@ export function validateWorkoutPrescription(value, base) {
   return { planName: normalized.name, dayId: day.id, dayName: day.name, unit: normalized.unit, exercises: day.exercises };
 }
 
-export function planService(store, { now = () => new Date(), validateContent = (_kind, value) => value, beforePublish = () => {}, afterPublish = () => {} } = {}) {
+export function planService(store, { now = () => new Date(), validateContent = (_kind, value) => value, beforePublish = () => {}, afterPublish = () => {}, afterRemove = () => {} } = {}) {
   return {
     sources(trainerId, { kind = 'workout', limit = 20 } = {}) {
       if (kind !== 'workout') throw new HttpError(422, 'VALIDATION_ERROR', 'Only workout plan sources are available');
@@ -55,12 +60,28 @@ export function planService(store, { now = () => new Date(), validateContent = (
         FROM plan_revisions pr
         JOIN plan_assignments pa ON pa.id=pr.assignment_id AND pa.kind='workout'
         JOIN client_relationships cr ON cr.id=pa.relationship_id
-        WHERE cr.trainer_id=?
+        WHERE cr.trainer_id=? AND NOT EXISTS (SELECT 1 FROM workout_occurrences o WHERE o.revision_id=pr.id AND o.is_one_time=1)
         ORDER BY pr.published_at DESC,pr.revision_number DESC
         LIMIT ?`).all(trainerId, safeLimit).map(row => {
           const content = JSON.parse(row.content_json);
           return { id: row.revision_id, sourceType: 'recent_assignment', revisionId: row.revision_id, planName: content.name, clientName: store.identities?.findUser?.(row.client_id)?.name || 'Client', publishedAt: row.published_at, content };
         });
+    },
+    remove(trainerId, { relationshipId, expectedVersion: requested }) {
+      const version = expectedVersion(requested);
+      const relationship = store.db.prepare('SELECT * FROM client_relationships WHERE id = ? AND trainer_id = ? AND status = ?').get(relationshipId, trainerId, 'active');
+      if (!relationship) throw new HttpError(404, 'NOT_FOUND', 'Relationship not found');
+      beforePublish(relationshipId, 'workout');
+      return store.transaction(() => {
+        const assignment = store.db.prepare("SELECT * FROM plan_assignments WHERE relationship_id = ? AND kind = 'workout'").get(relationshipId);
+        if (!assignment || !assignment.current_revision_id) throw new HttpError(404, 'NOT_FOUND', 'No assigned workout plan was found');
+        if (assignment.version !== version) throw new HttpError(409, 'VERSION_CONFLICT', 'Reload the client plan before removing it');
+        afterRemove(assignment, relationship);
+        const removedAt = now().toISOString();
+        store.db.prepare(`UPDATE plan_assignments SET current_revision_id=NULL,source_template_id=NULL,
+          materialized_through=NULL,version=version+1,updated_at=? WHERE id=?`).run(removedAt, assignment.id);
+        return { id: assignment.id, relationshipId, kind: 'workout', version: version + 1, removedAt };
+      })();
     },
     publish(trainerId, { relationshipId, kind, sourceTemplateId = null, content, expectedVersion: requested }) {
       const version = expectedVersion(requested);

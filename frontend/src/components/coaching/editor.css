@@ -6,7 +6,8 @@
 .coaching-schedule strong{display:block;font-size:14px;margin:5px 0}
 
 .coaching-editor{display:grid;gap:16px}
-.coaching-editor>label,.coaching-exercise label,.coaching-editor-heading>label{display:grid;gap:5px}
+.coaching-editor>label,.coaching-exercise label,.coaching-editor-heading>label{display:grid;gap:5px;min-width:0}
+.coaching-editor input,.coaching-editor select,.coaching-editor textarea{width:100%;min-width:0}
 .coaching-editor label>span,.coaching-exercise label>span,.coaching-occurrence-controls label>span{font-size:11px;font-weight:700;color:var(--label-2)}
 .coaching-editor input,.coaching-editor select,.coaching-editor textarea,
 .coaching-template-bar input,.coaching-template-bar select,.coaching-occurrence-list input{
@@ -16,8 +17,10 @@
 .coaching-editor-day{padding:18px;border-radius:var(--r-lg);background:var(--surface-2);display:grid;gap:13px}
 .coaching-editor-heading,.coaching-exercise-title{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .coaching-editor-heading>label{flex:1}
+.coaching-editor-heading>.btn{width:auto;flex:none}
 .coaching-exercise-title>div{display:flex;gap:4px}
-.coaching-exercise-title>div:first-child{display:grid;gap:2px}
+.coaching-exercise-title>div:first-child{display:grid;gap:2px;min-width:0}
+.coaching-exercise-title>div:last-child{flex-shrink:0}
 .coaching-exercise-title small{display:block;color:var(--label-2)}
 .coaching-exercise-title button{min-width:36px;min-height:36px;border:var(--hair) solid var(--coach-border);border-radius:var(--r-sm);background:var(--surface-3);padding:0 8px}
 
@@ -28,7 +31,7 @@
 .coaching-weekdays button.on{background:var(--trainer-fill);color:var(--trainer-on-fill);border-color:var(--trainer-fill)}
 .coaching-weekdays button:disabled{opacity:.35}
 
-.coaching-exercise{display:grid;grid-template-columns:repeat(5,minmax(90px,1fr));gap:10px;padding:12px;background:var(--surface);border-radius:var(--r)}
+.coaching-exercise{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;padding:12px;background:var(--surface);border-radius:var(--r)}
 .coaching-exercise-title,.coaching-exercise-notes{grid-column:1/-1}
 .coaching-publish{margin-top:24px}
 .coaching-composer{scroll-margin-top:16px}
@@ -63,9 +66,18 @@
 .coaching-catalog-picker .chips{display:flex;gap:5px;overflow:auto}
 .coaching-catalog-picker .chip{flex:none;padding:7px 10px;border:var(--hair) solid var(--coach-border);border-radius:var(--r-sm);background:var(--surface);color:var(--label)}
 .coaching-catalog-picker .chip.on{background:var(--trainer-fill);color:var(--trainer-on-fill)}
-.coaching-catalog-results{max-height:420px;overflow:auto}
-.coaching-catalog-results .item{width:100%;text-align:left;color:var(--label)}
+/* Keep wrapped results at natural height in both the list and desktop grid. */
+.coaching-catalog-results{max-height:420px;overflow:auto;grid-auto-rows:max-content;align-content:start}
+.coaching-catalog-results .item{width:100%;flex-shrink:0;text-align:left;color:var(--label)}
 .coaching-catalog-results .tt,.coaching-catalog-results .ss{display:block}
+
+@media(max-width:1024px),(any-pointer:coarse){
+  .coaching-weekdays button{width:44px;height:44px;flex:0 0 44px;font-size:12px}
+  .coaching-exercise-title button{min-width:44px;min-height:44px}
+  .coaching-catalog-picker .chip{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px}
+  .coaching-editor input,.coaching-editor select,.coaching-editor textarea,
+  .coaching-template-bar input,.coaching-template-bar select,.coaching-occurrence-list input{min-height:44px}
+}
 
 @media(max-width:900px){
   .coaching-exercise{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -75,6 +87,8 @@
   .coaching-occurrence-summary{width:100%}
 }
 @media(max-width:480px){
+  .coaching-editor-heading{align-items:stretch;flex-direction:column}
+  .coaching-editor-heading>.btn{align-self:flex-start}
   .coaching-exercise{grid-template-columns:1fr}
   .coaching-exercise-title,.coaching-exercise-notes{grid-column:auto}
   .coaching-exercise-title{align-items:stretch;flex-direction:column}
@@ -87,9 +101,9 @@
 /* Tablet / desktop — let the template bar and exercise grid use the extra
    width instead of staying phone-narrow (FR-016). */
 @media(min-width:768px){
-  .coaching-exercise{grid-template-columns:repeat(3,minmax(110px,1fr))}
+  .coaching-exercise{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media(min-width:1440px){
-  .coaching-exercise{grid-template-columns:repeat(6,minmax(100px,1fr))}
+  .coaching-exercise{grid-template-columns:repeat(6,minmax(0,1fr))}
   .coaching-template-bar{grid-template-columns:minmax(220px,1fr) minmax(320px,2fr)}
 }

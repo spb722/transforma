@@ -4,7 +4,7 @@ import { dateInZone, isoWeekday, validIsoDate } from './dates.js';
 import { expectedVersion, HttpError, text } from './validation.js';
 
 const response = row => row ? { id: row.id, text: row.text, reviewedCheckInVersion: row.reviewed_check_in_version, version: row.version, createdAt: row.created_at, updatedAt: row.updated_at } : null;
-const shape = (row, reply = null) => ({ id: row.id, relationshipId: row.relationship_id, weekStart: row.week_start, adherence: row.adherence, weightValue: row.weight_value, weightUnit: row.weight_unit, notes: row.notes, version: row.version, createdAt: row.created_at, updatedAt: row.updated_at, response: response(reply), needsReview: !!reply && reply.reviewed_check_in_version !== row.version });
+const shape = (row, reply = null) => ({ id: row.id, relationshipId: row.relationship_id, weekStart: row.week_start, adherence: row.adherence, weightValue: row.weight_value, weightUnit: row.weight_unit, notes: row.notes, version: row.version, createdAt: row.created_at, updatedAt: row.updated_at, response: response(reply), needsReview: !reply || reply.reviewed_check_in_version !== row.version });
 
 export function checkInService(store, { now = () => new Date() } = {}) {
   const get = id => {

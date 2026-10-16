@@ -24,6 +24,8 @@ import { templateService } from './coaching/templates.js';
 import { planService, validateWorkoutContent } from './coaching/plans.js';
 import { occurrenceService } from './coaching/occurrences.js';
 import { sessionService } from './coaching/sessions.js';
+import { sessionFeedbackService } from './coaching/session-feedback.js';
+import { contactService } from './coaching/contact.js';
 import { validateDietContent } from './coaching/diets.js';
 import { checkInService } from './coaching/check-ins.js';
 import { progressService } from './coaching/progress.js';
@@ -115,7 +117,7 @@ setInterval(() => coachingOccurrences.catchUpAll(), 6 * 60 * 60 * 1000).unref();
 const coachingRelationships = relationshipService(coachingStore, { beforeEnd: coachingOccurrences.endRelationship });
 const validatePlanContent = (kind, value) => kind === 'workout' ? validateWorkoutContent(value) : validateDietContent(value);
 const coachingTemplates = templateService(coachingStore, { validateContent: validatePlanContent });
-const coachingPlans = planService(coachingStore, { validateContent: validatePlanContent, beforePublish: (relationshipId, kind) => { if (kind === 'workout') coachingOccurrences.catchUpRelationship(relationshipId) }, afterPublish: coachingOccurrences.reconcile });
+const coachingPlans = planService(coachingStore, { validateContent: validatePlanContent, beforePublish: (relationshipId, kind) => { if (kind === 'workout') coachingOccurrences.catchUpRelationship(relationshipId) }, afterPublish: coachingOccurrences.reconcile, afterRemove: coachingOccurrences.removeAssignment });
 const coachingSessions = sessionService(coachingStore, { beforeStart: coachingOccurrences.catchUpAll });
 const coachingCheckIns = checkInService(coachingStore);
 const coachingProgress = progressService(coachingStore, { readPersonalState: readState });
@@ -137,6 +139,8 @@ const coachingHandlers = relationshipHandlers({
   plans: coachingPlans,
   occurrences: coachingOccurrences,
   sessions: coachingSessions,
+  sessionFeedback: sessionFeedbackService(coachingStore),
+  contacts: contactService(coachingStore),
   checkIns: coachingCheckIns,
   progress: coachingProgress,
   history: coachingHistory,
@@ -150,7 +154,7 @@ const readCoachingSession = req => {
 
 function projectAssignedResults(userId, state) {
   if (!state) return state;
-  const canonical = coachingStore.db.prepare("SELECT id,scheduled_date,prescription_json,actual_json,summary_json,started_at,client_finished_at FROM assigned_sessions WHERE client_id=? AND state='finished'").all(userId).map(row => ({ id:row.id,d:row.scheduled_date,start:Date.parse(row.started_at),end:Date.parse(row.client_finished_at),name:JSON.parse(row.prescription_json).dayName,entries:JSON.parse(row.actual_json||'{\"entries\":[]}').entries||[],assignedSessionId:row.id,assignedPrescription:JSON.parse(row.prescription_json),assignedSync:'synced',summary:JSON.parse(row.summary_json||'null') }));
+  const canonical = coachingStore.db.prepare("SELECT id,scheduled_date,prescription_json,actual_json,summary_json,started_at,client_finished_at,received_at FROM assigned_sessions WHERE client_id=? AND state='finished'").all(userId).map(row => ({ id:row.id,d:row.scheduled_date,start:Date.parse(row.started_at),end:Date.parse(row.client_finished_at),name:JSON.parse(row.prescription_json).dayName,entries:JSON.parse(row.actual_json||'{\"entries\":[]}').entries||[],assignedSessionId:row.id,assignedPrescription:JSON.parse(row.prescription_json),assignedSync:'synced',assignedReceivedAt:row.received_at,summary:JSON.parse(row.summary_json||'null') }));
   const ids = new Set(canonical.map(item => item.id));
   return { ...state, workouts: [...(state.workouts || []).filter(item => !ids.has(item.id)), ...canonical] };
 }

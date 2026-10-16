@@ -32,14 +32,24 @@ self.addEventListener('fetch', e => {
   if (url.pathname.startsWith('/api/')) return    // never cache auth/data
 
   const isMedia = url.pathname.includes('/img/') || url.pathname.includes('/gif/')
+  const remember = async res => {
+    // Clone before handing the response body back to the page.
+    if (res.ok) {
+      const copy = res.clone()
+      try { await (await caches.open(CACHE)).put(e.request, copy) } catch { /* cache is optional */ }
+    }
+    return res
+  }
   if (isMedia) {
     e.respondWith(caches.open(CACHE).then(c => c.match(e.request).then(hit =>
-      hit || fetch(e.request).then(res => { if (res.ok) c.put(e.request, res.clone()); return res })
+      hit || fetch(e.request).then(remember)
     )))
   } else {
-    e.respondWith(fetch(e.request).then(res => {
-      if (res.ok) caches.open(CACHE).then(c => c.put(e.request, res.clone()))
-      return res
-    }).catch(() => caches.match(e.request).then(hit => hit || caches.match('index.html'))))
+    e.respondWith(fetch(e.request).then(remember).catch(async () => {
+      const hit = await caches.match(e.request)
+      if (hit) return hit
+      if (e.request.mode === 'navigate') return (await caches.match('index.html')) || (await caches.match('./')) || Response.error()
+      return Response.error()
+    }))
   }
 })

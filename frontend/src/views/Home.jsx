@@ -97,7 +97,7 @@ export default function Home() {
 
   const wThisWeek = S.workouts.filter(w => weekKey(w.d) === weekKey(todayISO())).length
   const plannedPerWeek = coachPlanActive
-    ? new Set(ownWorkspace.workout.content.days.flatMap(day => day.weekdays || [])).size
+    ? new Set((ownWorkspace.workout?.content?.days || []).flatMap(day => day.weekdays || [])).size
     : Object.keys(S.week).filter(k => S.week[k]).length
   const bwPoints = S.bodyweight.slice(-30).map(b => ({ t: b.t || new Date(b.d).getTime(), y: b.w, d: b.d }))
 
@@ -119,7 +119,9 @@ export default function Home() {
   }
 
   const coachTitle = selectedOccurrence?.state === 'canceled' ? t('Day off') : selectedOccurrence?.prescription?.dayName || t('No coach workout scheduled')
-  const coachStateLabel = selectedOccurrence?.state === 'started' ? t('In progress')
+  const coachResultLabel = ['started', 'completed'].includes(selectedOccurrence?.state)
+    ? selectedOccurrence.day?.label || selectedOccurrence.statusLabel : null
+  const coachStateLabel = coachResultLabel ? t(coachResultLabel) : selectedOccurrence?.state === 'started' ? t('In progress')
     : selectedOccurrence?.state === 'completed' ? t('Completed')
       : selectedOccurrence?.state === 'canceled' ? t('Given by your trainer')
         : selectedOccurrence?.customized && selectedOccurrence?.overrideDate ? t('Customized · Rescheduled')

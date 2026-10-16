@@ -1,0 +1,11 @@
+.session-feedback { text-align: left; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line, #38423e); }
+.session-feedback h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.session-feedback h3 small { font-size: 12px; color: var(--trainer-text); }
+.session-feedback label { display: grid; gap: 7px; font-weight: 600; }
+.session-feedback p { line-height: 1.5; }
+.session-feedback-ratings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 14px 0; }
+.session-feedback select { width: 100%; min-height: 44px; padding: 8px; color: var(--text); background: var(--surface, var(--bg)); border: 1px solid var(--line); border-radius: 8px; }
+.session-feedback-note, .session-feedback-reply p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.session-feedback-reply { margin: 16px 0; padding: 12px; border-left: 3px solid var(--acc); background: var(--surface); }
+.session-feedback-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+@media (max-width: 380px) { .session-feedback-ratings { grid-template-columns: 1fr; } }

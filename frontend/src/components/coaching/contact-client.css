@@ -1,0 +1,6 @@
+.contact-client { overflow-wrap: anywhere; }
+.contact-client-field { display: grid; gap: 8px; margin: 14px 0; font-weight: 600; }
+.contact-client-field input, .contact-client-field select { box-sizing: border-box; width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; }
+.contact-client-consent { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; line-height: 1.5; }
+.contact-client-consent input { flex: 0 0 auto; width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--acc); }
+.contact-client input:focus-visible, .contact-client select:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }

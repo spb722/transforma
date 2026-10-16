@@ -1,4 +1,8 @@
+import { addDays, dateInZone } from './dates.js';
+import { HttpError } from './validation.js';
 import { authorizeRelationship } from './access.js';
+import { completedOccurrenceCount } from './result-counts.js';
+import { sessionReport } from './session-report.js';
 
 const parsed = (value, fallback) => { try { return JSON.parse(value || '') } catch { return fallback } };
 
@@ -6,9 +10,12 @@ function assignedStrength(sessions) {
   return sessions.flatMap(session => {
     const prescription = parsed(session.prescription_json, {});
     const actual = parsed(session.actual_json, {});
-    const targets = new Map((prescription.exercises || []).map(exercise => [exercise.id, exercise]));
+    const targets = new Map((prescription.exercises || []).flatMap(exercise => [
+      [exercise.entryId || exercise.id, exercise],
+      [exercise.exerciseId || exercise.id, exercise]
+    ]));
     return (actual.entries || []).flatMap(entry => {
-      const target = targets.get(entry.id) || {};
+      const target = targets.get(entry.entryId || entry.id) || targets.get(entry.id) || {};
       if (target.mode && target.mode !== 'reps') return [];
       return (entry.sets || []).filter(set => set.done && Number.isFinite(Number(set.w)) && Number.isFinite(Number(set.r))).map(set => ({
         date: session.scheduled_date, sessionId: session.id, exerciseId: entry.id,
@@ -19,13 +26,26 @@ function assignedStrength(sessions) {
   });
 }
 
-export function progressService(store, { readPersonalState = () => null } = {}) {
+export function progressService(store, { readPersonalState = () => null, now = () => new Date() } = {}) {
   return {
-    get(user, relationshipId, from = '0000-01-01', to = '9999-12-31') {
+    get(user, relationshipId, from = '0000-01-01', to = '9999-12-31', weeks = null) {
       const rel = store.db.prepare('SELECT * FROM client_relationships WHERE id=?').get(relationshipId);
       authorizeRelationship(user, rel, 'read');
+      if (weeks !== null) {
+        const count = Number(weeks);
+        if (![4, 12, 24].includes(count)) throw new HttpError(422, 'VALIDATION_ERROR', 'Choose a 4, 12, or 24 week progress range');
+        to = dateInZone(now(), rel.time_zone);
+        from = addDays(to, 1 - count * 7);
+      }
       const occurrences = store.db.prepare('SELECT * FROM workout_occurrences WHERE relationship_id=? AND scheduled_date BETWEEN ? AND ?').all(relationshipId, from, to);
-      const sessions = store.db.prepare("SELECT * FROM assigned_sessions WHERE relationship_id=? AND scheduled_date BETWEEN ? AND ? AND state='finished'").all(relationshipId, from, to);
+      const attempts = store.db.prepare('SELECT * FROM assigned_sessions WHERE relationship_id=? AND scheduled_date BETWEEN ? AND ? ORDER BY started_at ASC, id ASC').all(relationshipId, from, to);
+      const sessions = attempts.filter(session => session.state === 'finished');
+      const attemptCounts = new Map();
+      const reports = attempts.map(session => {
+        const attempt = (attemptCounts.get(session.occurrence_id) || 0) + 1;
+        attemptCounts.set(session.occurrence_id, attempt);
+        return sessionReport(session, attempt);
+      }).reverse();
       const personal = readPersonalState(rel.client_id) || {};
       const assignedIds = new Set(sessions.map(item => item.id));
       const personalWorkouts = (personal.workouts || []).filter(item => item.d >= from && item.d <= to && !assignedIds.has(item.id));
@@ -33,9 +53,9 @@ export function progressService(store, { readPersonalState = () => null } = {}) 
       const strength = assignedStrength(sessions);
       const weight = (personal.bodyweight || []).filter(item => item.d >= from && item.d <= to).map(item => ({ date: item.d, value: item.w, unit: personal.unit || 'kg', source: 'personal' }));
       return {
-        relationshipId, from, to,
+        relationshipId, from, to, timeZone: rel.time_zone, sessions: reports,
         scheduled: occurrences.filter(item => item.state !== 'canceled').length,
-        completed: new Set(sessions.map(item => item.occurrence_id)).size,
+        completed: completedOccurrenceCount(sessions),
         partial: sessions.filter(item => parsed(item.summary_json, {}).classification === 'partial').length,
         extra: sessions.filter(item => parsed(item.summary_json, {}).classification === 'extra').length,
         personalExtra: personalWorkouts.length,

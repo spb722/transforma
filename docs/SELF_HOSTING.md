@@ -3,6 +3,9 @@
 transforma is two small containers (a web server and an API) plus a folder of your data.
 This guide takes you from "just cloned it" to "using it from my phone over the internet".
 
+For the complete Google Cloud walkthrough, open the [Google VM migration and deployment guide](GOOGLE_VM_MIGRATION_GUIDE.html).
+It includes the Google UI fields, project tar upload, DNS, HTTPS, full data migration and rollback.
+
 ## 1. Run it locally (5 minutes)
 
 Requirements: [Docker](https://docs.docker.com/get-docker/) with the Compose plugin.

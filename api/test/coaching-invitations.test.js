@@ -108,3 +108,16 @@ test('disabled trainers invalidate pending invitations and invitation retries ne
   assert.throws(() => fx.invitations.accept(issued.token, testUsers.clientA.id, { consentVersion: CONSENT_VERSION, confirmSharing: true }), error => error.status === 404);
   fx.store.close();
 });
+
+test('used invitation preview opens only the authenticated recipient’s existing relationship', () => {
+  const fx = fixture();
+  const invite = fx.invitations.create(testUsers.trainerA.id);
+  const accepted = fx.invitations.accept(invite.token, testUsers.clientA.id, { consentVersion: CONSENT_VERSION, confirmSharing: true });
+  assert.deepEqual(fx.invitations.preview(invite.token, testUsers.clientA.id), { relationshipId: accepted.id });
+  for (const recipient of [undefined, testUsers.clientB.id, testUsers.trainerA.id, testUsers.trainerB.id]) {
+    assert.throws(() => fx.invitations.preview(invite.token, recipient), error => error.status === 404 && error.code === 'INVITATION_UNAVAILABLE');
+  }
+  fx.relationships.end(testUsers.clientA, accepted.id, accepted.version);
+  assert.deepEqual(fx.invitations.preview(invite.token, testUsers.clientA.id), { relationshipId: accepted.id });
+  fx.store.close();
+});

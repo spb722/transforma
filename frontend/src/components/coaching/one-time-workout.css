@@ -1,0 +1,16 @@
+.one-time-workout { border: 1px solid var(--coach-border); border-radius: 16px; padding: 20px; background: var(--surface); margin: 20px 0; scroll-margin-top: 24px; }
+.one-time-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.one-time-heading h2 { margin: 4px 0 12px; }
+.one-time-heading h2:focus { outline: none; }
+.one-time-eyebrow { font-size: 12px; color: var(--label-2); text-transform: uppercase; letter-spacing: .08em; }
+.one-time-hint { color: var(--label-2); margin: 0 0 20px; line-height: 1.5; }
+.one-time-workout fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.one-time-date, .one-time-source { display: grid; gap: 8px; margin-bottom: 18px; }
+.one-time-date input, .one-time-source select { box-sizing: border-box; width: 100%; min-height: 44px; border: 1px solid var(--coach-border); border-radius: 8px; padding: 10px 12px; background: var(--surface-2); color: var(--label); font: inherit; }
+.one-time-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+.one-time-review { line-height: 1.6; overflow-wrap: anywhere; }
+.one-time-review > ol > li { margin-bottom: 16px; }
+.one-time-review ul { padding-left: 20px; }
+.one-time-review p { white-space: pre-wrap; }
+.one-time-error { color: var(--red, #d75a54); line-height: 1.5; }
+@media (max-width: 480px) { .one-time-workout { padding: 14px; } .one-time-actions > button { flex: 1 1 auto; } }

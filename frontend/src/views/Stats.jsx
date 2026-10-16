@@ -12,6 +12,7 @@ import Icon from '../components/Icon.jsx'
 import BodyMap, { BodyMapLegend } from '../components/BodyMap.jsx'
 import { loadOfWorkouts, rankOf, MUSCLE_NAME } from '../lib/muscles.js'
 import { e1rmSeries, best1RM } from '../lib/onerm.js'
+import { workoutInUnit } from '../lib/coaching/logger.js'
 import {
   hasEffort, displayScale, scaleName, toScale, avgRir, effortSummary, effortWeeks,
   effortHistogram, isHardSet, HARD_RIR
@@ -140,6 +141,7 @@ export default function Stats() {
   const anyEffort = hasEffort(S)
   const kind = displayScale(S)
   const hd = scaleName(kind)
+  const statsState = { ...S, workouts: S.workouts.map(workout => workoutInUnit(workout, S.unit)) }
 
   const bwPts = S.bodyweight.filter(b => range === 0 || (b.t || new Date(b.d).getTime()) > now - range * 86400000)
     .map(b => ({ t: b.t || new Date(b.d).getTime(), y: b.w, d: b.d }))
@@ -165,7 +167,7 @@ export default function Stats() {
   const exUnit = curCardio ? 'km/h' : curTimed ? 's' : S.unit
   let exPts = [], exList = [], exBest = 0
   if (curEx) {
-    S.workouts.forEach(w => {
+    statsState.workouts.forEach(w => {
       const en = w.entries.find(e => e.id === curEx)
       if (en) { const mx = Math.max(0, ...en.sets.filter(s => s.done).map(metric), curCardio || curTimed ? 0 : (en.topW || 0)); if (mx > 0) { exPts.push({ t: w.start, y: mx, d: w.d, sets: en.sets.filter(s => s.done), target: en.target }); if (mx > exBest) exBest = mx } }
     })
@@ -173,8 +175,8 @@ export default function Stats() {
   }
   // Estimated 1RM (issue #18) — only reps-mode training produces one, so cardio and timed
   // work simply have no points and the toggle stays hidden.
-  const e1Pts = curEx ? e1rmSeries(S, curEx) : []
-  const e1Best = curEx ? best1RM(S, curEx) : null
+  const e1Pts = curEx ? e1rmSeries(statsState, curEx) : []
+  const e1Best = curEx ? best1RM(statsState, curEx) : null
   const showE1 = e1Pts.length > 0
   // Effort on this exercise, per session. It rides on the top-set curve as well as having a
   // curve of its own, because the two only mean something together: the same weight moved

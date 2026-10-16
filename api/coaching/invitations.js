@@ -53,9 +53,13 @@ export function invitationService(store, { config, now = () => new Date() } = {}
       return store.db.prepare('SELECT * FROM invitations WHERE trainer_id = ? ORDER BY created_at DESC').all(trainerId)
         .map(row => ({ id: row.id, state: invitationState(row, now()), createdAt: row.created_at, expiresAt: row.expires_at, acceptedAt: row.accepted_at, acceptedBy: row.accepted_by }));
     },
-    preview(token) {
+    preview(token, recipientId = null) {
       const row = store.db.prepare(`SELECT i.*, p.display_name, p.business_time_zone
         FROM invitations i JOIN trainer_profiles p ON p.user_id = i.trainer_id WHERE i.token_hash = ?`).get(hashToken(token));
+      if (recipientId && row?.accepted_by === recipientId && row.relationship_id) {
+        const owned = store.db.prepare('SELECT id FROM client_relationships WHERE id = ? AND client_id = ?').get(row.relationship_id, recipientId);
+        if (owned) return { relationshipId: owned.id };
+      }
       if (!row || invitationState(row, now()) !== 'pending' || !store.identities?.isEnabled?.(row.trainer_id)) throw new HttpError(404, 'INVITATION_UNAVAILABLE', 'This invitation is unavailable. Ask the trainer for a new link.');
       return {
         trainer: { id: row.trainer_id, displayName: row.display_name, businessTimeZone: row.business_time_zone },

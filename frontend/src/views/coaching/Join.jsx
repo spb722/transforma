@@ -18,11 +18,23 @@ export default function Join() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    const controller = new AbortController()
+    let current = true
     rememberJoinIntent(token)
+    setPreview(null)
+    setAccepted(false)
     setError(null)
-    coachingApi('/invitations/preview', { method: 'POST', body: { token } })
-      .then(setPreview).catch(setError)
-  }, [token])
+    coachingApi('/invitations/preview', { method: 'POST', body: { token }, signal: controller.signal })
+      .then(data => {
+        if (!current) return
+        if (data.relationshipId) {
+          clearJoinIntent()
+          nav(`/coaching/${data.relationshipId}`, { replace: true })
+        } else setPreview(data)
+      })
+      .catch(error => { if (current && error.name !== 'AbortError') setError(error) })
+    return () => { current = false; controller.abort() }
+  }, [token, user?.id, nav])
 
   const join = async () => {
     setBusy(true); setError(null)
@@ -40,6 +52,10 @@ export default function Join() {
       <h1>{preview ? `${preview.trainer.displayName} invited you` : 'Open your coaching invitation'}</h1>
       {!preview && !error && <p className="coaching-muted">Checking this invitation…</p>}
       {error && <div className="coaching-error">{error.message}</div>}
+      {error && !user && <div className="join-login">
+        <p>If you already used this invitation, sign in with the same passkey to open your coaching.</p>
+        <Login embedded allowGuest={false} />
+      </div>}
       {preview && <>
         <div className="join-consent">
           <h2>What you will share</h2>

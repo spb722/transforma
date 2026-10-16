@@ -1,11 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { tempCoachingData, identityAuthority, fixedClock, testUsers } from './coaching-helpers.mjs';
+import { tempCoachingData, identityAuthority, fixedClock, testMutationId, testUsers } from './coaching-helpers.mjs';
 import { openCoachingDb } from '../coaching/db.js';
 import { profileService } from '../coaching/profiles.js';
 import { invitationService, CONSENT_VERSION } from '../coaching/invitations.js';
 import { planService, validateWorkoutContent } from '../coaching/plans.js';
 import { occurrenceService } from '../coaching/occurrences.js';
+import { workspaceService } from '../coaching/workspaces.js';
+import { relationshipHandlers } from '../coaching/routes.js';
 
 function fixture() {
   const identities = identityAuthority(); const store = openCoachingDb({ dataDir: tempCoachingData(), identities });
@@ -14,8 +16,9 @@ function fixture() {
   const invites = invitationService(store, { config, now }); const token = invites.create(testUsers.trainerA.id).token;
   const relationship = invites.accept(token, testUsers.clientA.id, { consentVersion: CONSENT_VERSION, confirmSharing: true });
   const occurrences = occurrenceService(store, { now });
-  const plans = planService(store, { now, validateContent: (kind, value) => kind === 'workout' ? validateWorkoutContent(value) : value, afterPublish: occurrences.reconcile });
-  return { store, relationship, plans, occurrences };
+  const plans = planService(store, { now, validateContent: (kind, value) => kind === 'workout' ? validateWorkoutContent(value) : value, afterPublish: occurrences.reconcile, afterRemove: occurrences.removeAssignment });
+  const workspaces = workspaceService(store, { config, identities, occurrences, now });
+  return { store, relationship, plans, occurrences, workspaces };
 }
 
 const workout = { name: 'Strength week', unit: 'kg', days: [{ id: 'push', name: 'Push', weekdays: [1, 3], exercises: [{ id: 'bench', name: 'Bench press', mode: 'reps', sets: [{ reps: 8, weight: 40 }], restSec: 90, notes: '' }] }] };
@@ -30,6 +33,53 @@ test('workout publication creates an isolated immutable revision and 28-day occu
   fx.plans.publish(testUsers.trainerA.id, { relationshipId: fx.relationship.id, kind: 'workout', expectedVersion: 1, content: revised });
   assert.equal(JSON.parse(fx.store.db.prepare('SELECT content_json FROM plan_revisions WHERE id = ?').get(first.revisionId).content_json).days[0].exercises[0].sets[0].weight, 40);
   assert.throws(() => fx.plans.publish(testUsers.clientA.id, { relationshipId: fx.relationship.id, kind: 'workout', expectedVersion: 2, content: workout }), e => e.status === 404);
+  fx.store.close();
+});
+
+test('removing an assigned workout stops future sessions and preserves history for reassigning', () => {
+  const fx = fixture();
+  const published = fx.plans.publish(testUsers.trainerA.id, { relationshipId: fx.relationship.id, kind: 'workout', expectedVersion: 0, content: workout });
+  const future = fx.store.db.prepare("SELECT * FROM workout_occurrences WHERE assignment_id=? AND scheduled_date>'2026-09-07' ORDER BY scheduled_date LIMIT 1").get(published.id);
+  const completed = fx.store.db.prepare("SELECT * FROM workout_occurrences WHERE assignment_id=? AND scheduled_date='2026-09-07'").get(published.id);
+  fx.store.db.prepare("UPDATE workout_occurrences SET state='completed' WHERE id=?").run(completed.id);
+  const moved = fx.occurrences.move(testUsers.trainerA, future.id, future.version, '2026-09-12');
+  assert.throws(() => fx.plans.remove(testUsers.clientA.id, { relationshipId: fx.relationship.id, expectedVersion: published.version }), error => error.status === 404);
+  assert.throws(() => fx.plans.remove(testUsers.trainerA.id, { relationshipId: fx.relationship.id, expectedVersion: 0 }), error => error.status === 409);
+  const removed = fx.plans.remove(testUsers.trainerA.id, { relationshipId: fx.relationship.id, expectedVersion: published.version });
+  assert.equal(removed.version, 2);
+  assert.equal(fx.store.db.prepare('SELECT current_revision_id FROM plan_assignments WHERE id=?').get(published.id).current_revision_id, null);
+  assert.equal(fx.occurrences.catchUpRelationship(fx.relationship.id), 0);
+  const canceled = fx.store.db.prepare('SELECT * FROM workout_occurrences WHERE id=?').get(future.id);
+  assert.equal(canceled.state, 'canceled');
+  assert.equal(canceled.cancellation_reason, 'plan_removed');
+  assert.equal(canceled.scheduled_date, future.original_date);
+  assert.equal(canceled.override_date, null);
+  assert.equal(fx.store.db.prepare('SELECT state FROM workout_occurrences WHERE id=?').get(completed.id).state, 'completed');
+  assert.ok(fx.store.db.prepare('SELECT id FROM plan_revisions WHERE id=?').get(published.revisionId));
+  assert.throws(() => fx.plans.remove(testUsers.trainerA.id, { relationshipId: fx.relationship.id, expectedVersion: 2 }), error => error.status === 404);
+  const removedWorkspace = fx.workspaces.get(testUsers.trainerA, fx.relationship.id);
+  assert.equal(removedWorkspace.workout, null);
+  assert.equal(removedWorkspace.workoutAssignmentVersion, removed.version);
+  const reassigned = fx.plans.publish(testUsers.trainerA.id, { relationshipId: fx.relationship.id, kind: 'workout', expectedVersion: removedWorkspace.workoutAssignmentVersion, content: workout });
+  assert.equal(reassigned.id, published.id);
+  assert.equal(fx.workspaces.get(testUsers.clientA, fx.relationship.id).workoutAssignmentVersion, reassigned.version);
+  assert.equal(fx.store.db.prepare('SELECT state FROM workout_occurrences WHERE id=?').get(future.id).state, 'scheduled');
+  fx.store.close();
+});
+
+test('a replayed occurrence success cannot mask a newer schedule change', () => {
+  const fx = fixture();
+  const published = fx.plans.publish(testUsers.trainerA.id, { relationshipId: fx.relationship.id, kind: 'workout', expectedVersion: 0, content: workout });
+  const row = fx.store.db.prepare("SELECT * FROM workout_occurrences WHERE assignment_id=? AND original_date='2026-09-09'").get(published.id);
+  const moved = fx.occurrences.move(testUsers.trainerA, row.id, row.version, '2026-09-10');
+  const handlers = relationshipHandlers({ store: fx.store, occurrences: fx.occurrences, config: { trainerIds: new Set([testUsers.trainerA.id]) } });
+  const body = { mutationId: testMutationId('reset-replay'), occurrenceId: row.id, expectedVersion: moved.version };
+  const first = handlers['POST /api/coaching/occurrences/reset']({ user: testUsers.trainerA, body });
+  assert.equal(first.scheduledDate, '2026-09-09');
+  assert.equal(handlers['POST /api/coaching/occurrences/reset']({ user: testUsers.trainerA, body }).version, first.version);
+  const newer = fx.occurrences.move(testUsers.trainerA, row.id, first.version, '2026-09-11');
+  assert.throws(() => handlers['POST /api/coaching/occurrences/reset']({ user: testUsers.trainerA, body }), error => error.status === 409);
+  assert.equal(fx.store.db.prepare('SELECT scheduled_date FROM workout_occurrences WHERE id=?').get(row.id).scheduled_date, newer.scheduledDate);
   fx.store.close();
 });
 

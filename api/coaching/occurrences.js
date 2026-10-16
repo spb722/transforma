@@ -13,6 +13,7 @@ const shape = row => {
   overrideDate: row.override_date, state: row.state,
   cancellationReason: row.cancellation_reason || null,
   prescription: JSON.parse(overridden || row.prescription_json),
+  oneTime: !!row.is_one_time,
   customized: !!overridden, customizedAt: row.override_updated_at || null,
   version: row.version
   });
@@ -64,6 +65,42 @@ export function occurrenceService(store, { now = () => new Date() } = {}) {
   };
 
   const service = {
+    create(user, { relationshipId, scheduledDate, prescription: input }) {
+      return store.transaction(() => {
+        const relationship = store.db.prepare('SELECT * FROM client_relationships WHERE id=?').get(relationshipId);
+        authorizeRelationship(user, relationship, 'write-trainer');
+        const today = dateInZone(now(), relationship.time_zone);
+        if (!validIsoDate(scheduledDate) || scheduledDate < today) throw new HttpError(422, 'VALIDATION_ERROR', 'Choose today or a future date');
+        const id = crypto.randomUUID();
+        const content = validateWorkoutPrescription(input, { planName: 'One-time workout', dayId: id });
+        service.catchUpRelationship(relationshipId);
+        let assignment = store.db.prepare("SELECT * FROM plan_assignments WHERE relationship_id=? AND kind='workout'").get(relationshipId);
+        const occupied = store.db.prepare("SELECT id FROM workout_occurrences WHERE relationship_id=? AND scheduled_date=? AND state<>'canceled'").get(relationshipId, scheduledDate);
+        // Beyond the rolling calendar, consult the recurring rule as well. An explicit
+        // day off or a moved recurring session has already freed its original date.
+        const existingDate = assignment && store.db.prepare('SELECT id FROM workout_occurrences WHERE assignment_id=? AND original_date=? AND is_one_time=0').get(assignment.id, scheduledDate);
+        if (occupied || (assignment && !existingDate && naturalCollision({ assignment_id: assignment.id }, scheduledDate))) {
+          throw new HttpError(409, 'DATE_OCCUPIED', 'Another assigned session uses this date. Choose an empty date or manage that workout.');
+        }
+        const at = now().toISOString();
+        if (!assignment) {
+          const assignmentId = crypto.randomUUID();
+          store.db.prepare("INSERT INTO plan_assignments (id,relationship_id,kind,created_at,updated_at) VALUES (?,?,'workout',?,?)").run(assignmentId, relationshipId, at, at);
+          assignment = store.db.prepare('SELECT * FROM plan_assignments WHERE id=?').get(assignmentId);
+        }
+        // Sessions require an immutable revision reference. This snapshot is never made
+        // current, so adding a single workout cannot turn it into a recurring plan.
+        const revisionId = crypto.randomUUID();
+        const revisionNumber = (store.db.prepare('SELECT max(revision_number) AS n FROM plan_revisions WHERE assignment_id=?').get(assignment.id).n || 0) + 1;
+        const snapshot = { name: content.planName, unit: content.unit, days: [{ id, name: content.dayName, weekdays: [isoWeekday(scheduledDate)], exercises: content.exercises }] };
+        store.db.prepare('INSERT INTO plan_revisions (id,assignment_id,revision_number,content_json,published_by,published_at) VALUES (?,?,?,?,?,?)')
+          .run(revisionId, assignment.id, revisionNumber, JSON.stringify(snapshot), user.id, at);
+        store.db.prepare(`INSERT INTO workout_occurrences
+          (id,assignment_id,relationship_id,revision_id,recurrence_key,scheduled_date,original_date,prescription_json,is_one_time,created_at,updated_at)
+          VALUES (?,?,?,?,?,?,?,?,1,?,?)`).run(id, assignment.id, relationshipId, revisionId, `one-time:${id}`, scheduledDate, scheduledDate, JSON.stringify(content), at, at);
+        return shape(store.db.prepare('SELECT * FROM workout_occurrences WHERE id=?').get(id));
+      })();
+    },
     reconcile(result, relationship) {
       if (result.kind !== 'workout') return;
       const today = dateInZone(now(), relationship.time_zone);
@@ -77,7 +114,7 @@ export function occurrenceService(store, { now = () => new Date() } = {}) {
       }
 
       const existingRows = store.db.prepare(`SELECT * FROM workout_occurrences
-        WHERE assignment_id=? AND original_date BETWEEN ? AND ?`).all(result.id, today, through);
+        WHERE assignment_id=? AND is_one_time=0 AND original_date BETWEEN ? AND ?`).all(result.id, today, through);
       const desiredDayIds = new Set(result.content.days.map(day => day.id));
       const claimed = new Set();
       const matches = new Map();
@@ -113,7 +150,11 @@ export function occurrenceService(store, { now = () => new Date() } = {}) {
         const nextPrescription = prescription(result, wanted.day);
         if (!existing) {
           const occupied = store.db.prepare("SELECT id FROM workout_occurrences WHERE assignment_id=? AND scheduled_date=? AND state<>'canceled'").get(result.id, wanted.date);
-          if (occupied) throw new HttpError(409, 'DATE_OCCUPIED', `Another assigned session uses ${wanted.date}`);
+          if (occupied) {
+            const oneTime = store.db.prepare('SELECT is_one_time FROM workout_occurrences WHERE id=?').get(occupied.id);
+            if (oneTime?.is_one_time) continue;
+            throw new HttpError(409, 'DATE_OCCUPIED', `Another assigned session uses ${wanted.date}`);
+          }
           store.db.prepare(`INSERT INTO workout_occurrences
             (id,assignment_id,relationship_id,revision_id,recurrence_key,scheduled_date,original_date,prescription_json,created_at,updated_at)
             VALUES (?,?,?,?,?,?,?,?,?,?)`).run(crypto.randomUUID(), result.id, relationship.id, result.revisionId, key, wanted.date, wanted.date, nextPrescription, at, at);
@@ -131,7 +172,11 @@ export function occurrenceService(store, { now = () => new Date() } = {}) {
             .run(key, result.revisionId, nextPrescription, nextOverride, at, existing.id);
         } else if (existing.cancellation_reason === 'plan_removed') {
           const duplicate = store.db.prepare("SELECT id FROM workout_occurrences WHERE assignment_id=? AND scheduled_date=? AND id<>? AND state<>'canceled'").get(result.id, existing.scheduled_date, existing.id);
-          if (duplicate) throw new HttpError(409, 'DATE_OCCUPIED', `Another assigned session uses ${existing.scheduled_date}`);
+          if (duplicate) {
+            const oneTime = store.db.prepare('SELECT is_one_time FROM workout_occurrences WHERE id=?').get(duplicate.id);
+            if (oneTime?.is_one_time) continue;
+            throw new HttpError(409, 'DATE_OCCUPIED', `Another assigned session uses ${existing.scheduled_date}`);
+          }
           store.db.prepare(`UPDATE workout_occurrences SET state='scheduled',cancellation_reason=NULL,recurrence_key=?,revision_id=?,
             prescription_json=?,prescription_override_json=?,updated_at=?,version=version+1 WHERE id=?`)
             .run(key, result.revisionId, nextPrescription, nextOverride, at, existing.id);
@@ -155,15 +200,30 @@ export function occurrenceService(store, { now = () => new Date() } = {}) {
     },
 
     catchUpRelationship(relationshipId) {
-      const rows = store.db.prepare("SELECT id FROM plan_assignments WHERE relationship_id=? AND kind='workout'").all(relationshipId);
+      const rows = store.db.prepare("SELECT id FROM plan_assignments WHERE relationship_id=? AND kind='workout' AND current_revision_id IS NOT NULL").all(relationshipId);
       for (const row of rows) service.catchUpAssignment(row.id);
       return rows.length;
     },
 
     catchUpAll() {
       const rows = store.db.prepare(`SELECT a.id FROM plan_assignments a JOIN client_relationships c ON c.id=a.relationship_id
-        WHERE a.kind='workout' AND c.status='active'`).all();
+        WHERE a.kind='workout' AND a.current_revision_id IS NOT NULL AND c.status='active'`).all();
       for (const row of rows) service.catchUpAssignment(row.id);
+      return rows.length;
+    },
+
+    removeAssignment(assignment, relationship) {
+      const today = dateInZone(now(), relationship.time_zone);
+      const at = now().toISOString();
+      const rows = store.db.prepare(`SELECT * FROM workout_occurrences WHERE assignment_id=?
+        AND is_one_time=0 AND scheduled_date>=? AND (state='scheduled' OR (state='canceled' AND cancellation_reason='explicit'))`)
+        .all(assignment.id, today);
+      for (const row of rows) {
+        store.db.prepare(`UPDATE workout_occurrences SET state='canceled',cancellation_reason='plan_removed',
+          scheduled_date=original_date,override_date=NULL,prescription_override_json=NULL,
+          override_updated_at=NULL,version=version+1,updated_at=? WHERE id=?`).run(at, row.id);
+        event(row, relationship.trainer_id, 'plan_removed', row.scheduled_date, null, at);
+      }
       return rows.length;
     },
 

@@ -29,3 +29,7 @@ CLAUDE.md
 AGENTS.md
 graphify-out/
 .agents/
+
+# Local backups and test evidence — never commit
+data.bak-*/
+e2e/.relationship.json

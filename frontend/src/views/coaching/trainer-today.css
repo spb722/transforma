@@ -1,0 +1,16 @@
+.trainer-today-filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.trainer-today-filters button{display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 12px;border:1px solid var(--sep);border-radius:var(--r);background:var(--surface-2);color:var(--label);font:inherit;font-size:13px;font-weight:650}
+.trainer-today-filters button[aria-pressed=true]{background:var(--trainer-fill);color:var(--trainer-on-fill);border-color:var(--trainer-fill)}
+.trainer-today-filters button span{font-variant-numeric:tabular-nums;opacity:.8}
+.coaching-client-list>.trainer-today-row{padding:18px 10px;border-top:1px solid var(--sep);align-items:flex-start}
+.trainer-today-row:focus-visible,.trainer-today-filters button:focus-visible{outline:2px solid var(--trainer-text);outline-offset:2px}
+.trainer-today-row:hover{background:var(--surface-2)}
+.trainer-today-heading{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}
+.trainer-today-workout{display:block;margin-top:7px;font-size:14px;font-weight:600;color:var(--label)}
+.trainer-today-status{display:inline-flex;font-size:11px;font-weight:700;padding:4px 8px;border-radius:var(--r);background:var(--surface-2);color:var(--label-2);line-height:1.4}
+.trainer-today-status-in_progress,.trainer-today-status-scheduled{background:color-mix(in srgb,var(--trainer-text) 12%,var(--surface));color:var(--trainer-text)}
+.trainer-today-status-completed{background:color-mix(in srgb,var(--green) 12%,var(--surface));color:var(--green)}
+.trainer-today-attention,.trainer-today-status-partial,.trainer-today-status-zero,.trainer-today-status-abandoned{color:var(--label);font-weight:650}
+.trainer-today-attention{display:block;font-size:12px;margin-top:7px}
+.trainer-today-row>.icn{align-self:center}
+@media(max-width:600px){.trainer-today-filters{gap:6px}.trainer-today-filters button{font-size:12px;padding:8px}.coaching-client-list>.trainer-today-row{gap:10px;padding:16px 0}.trainer-today-heading{gap:5px}.trainer-today-row .coaching-avatar{width:32px;height:32px}.trainer-today-client small{line-height:1.55}}

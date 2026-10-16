@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import CoachingShell from '../../components/coaching/CoachingShell.jsx'
+import WorkoutDetails, { canEditWorkout, workoutStatus } from '../../components/coaching/WorkoutDetails.jsx'
 import WorkoutPlanEditor, { emptyWorkout } from '../../components/coaching/WorkoutPlanEditor.jsx'
 import { useCoachingStore } from '../../store/useCoachingStore.js'
+import { useUI } from '../../store/useUI.js'
 import { useStore } from '../../store/useStore.js'
 import { coachingApi, coachingMutation, retryableCoachingMutation } from '../../lib/coaching/api.js'
 import { dateInZone } from '../../lib/coaching/dates.js'
@@ -27,11 +29,29 @@ const occurrencePrescription = draft => ({
   exercises: draft.days[0].exercises
 })
 
+const verifiedOccurrence = (workspace, saved) => {
+  const current = (workspace?.occurrences || workspace?.workout?.occurrences || []).find(item => item.id === saved?.id)
+  return !!current && current.version === saved.version && current.scheduledDate === saved.scheduledDate
+    && current.state === saved.state && current.customized === saved.customized
+}
+
+const unverifiedChange = () => new Error('This change could not be verified. Reload the schedule and try again.')
+
 export default function WorkoutPlans() {
   const { relationshipId } = useParams()
+  return <ClientWorkoutPlans key={relationshipId} relationshipId={relationshipId} />
+}
+
+function ClientWorkoutPlans({ relationshipId }) {
   const nav = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const queryHandled = useRef(null)
+  const detailsRef = useRef(null)
+  const editorRef = useRef(null)
+  const [viewedOccurrenceId, setViewedOccurrenceId] = useState(null)
   const personalState = useStore(state => state.S)
-  const { trainerWorkspace, loadTrainerWorkspace, save } = useCoachingStore()
+  const { trainerWorkspace: loadedWorkspace, loadTrainerWorkspace, save } = useCoachingStore()
+  const trainerWorkspace = loadedWorkspace?.relationship?.id === relationshipId ? loadedWorkspace : null
   const initializedFor = useRef(null)
   const composerRef = useRef(null)
   const [draft, setDraftState] = useState(emptyWorkout)
@@ -44,6 +64,8 @@ export default function WorkoutPlans() {
   const [templateName, setTemplateName] = useState('')
   const [moves, setMoves] = useState({})
   const [status, setStatus] = useState('')
+  const [removingPlan, setRemovingPlan] = useState(false)
+  const [loadError, setLoadError] = useState('')
   const [composerOpen, setComposerOpen] = useState(false)
   const [managedOccurrenceId, setManagedOccurrenceId] = useState(null)
   const [savingOccurrenceId, setSavingOccurrenceId] = useState(null)
@@ -55,6 +77,7 @@ export default function WorkoutPlans() {
   // conflict, not folded into the same plain-text status as any other error.
   const [publishConflict, setPublishConflict] = useState(false)
   const [occurrenceConflicts, setOccurrenceConflicts] = useState({})
+  const notify = message => { setStatus(message); useUI.getState().toast(message) }
 
   const refreshSources = () => Promise.all([
     coachingApi('/templates?kind=workout').then(setTemplates),
@@ -62,9 +85,11 @@ export default function WorkoutPlans() {
   ]).catch(() => {})
 
   useEffect(() => {
+    let active = true
     initializedFor.current = null
-    loadTrainerWorkspace(relationshipId).catch(() => {})
+    loadTrainerWorkspace(relationshipId).catch(error => { if (active) setLoadError(error.message) })
     refreshSources()
+    return () => { active = false }
   }, [relationshipId, loadTrainerWorkspace])
 
   useEffect(() => {
@@ -74,7 +99,7 @@ export default function WorkoutPlans() {
     else setDraftState(emptyWorkout())
     setSelectedSource(trainerWorkspace.workout ? 'current' : 'blank')
     setSourceTemplateId(trainerWorkspace.workout?.sourceTemplateId || null)
-    setComposerOpen(!trainerWorkspace.workout)
+    setComposerOpen(!trainerWorkspace.workout && !searchParams.has('occurrence'))
     setDirty(false)
   }, [trainerWorkspace, relationshipId])
 
@@ -102,7 +127,7 @@ export default function WorkoutPlans() {
     setSelectedTemplateId(chosenTemplate?.id || null)
     setTemplateName(chosenTemplate?.name || next.name || '')
     setDirty(true)
-    setStatus('Source loaded into an independent draft')
+    notify('Source loaded into an independent draft')
   }
   const loadSource = () => {
     if (!dirty) { applySource(); return }
@@ -122,17 +147,45 @@ export default function WorkoutPlans() {
     setStatus('Publishing future unstarted sessions…')
     setPublishConflict(false)
     try {
-      await save(() => retryableCoachingMutation('/plans/publish', { relationshipId, kind: 'workout', expectedVersion: trainerWorkspace?.workout?.version || 0, sourceTemplateId, content: draft }))
-      await loadTrainerWorkspace(relationshipId)
+      const published = await save(() => retryableCoachingMutation('/plans/publish', { relationshipId, kind: 'workout', expectedVersion: trainerWorkspace?.workoutAssignmentVersion || 0, sourceTemplateId, content: draft }))
+      const workspace = await loadTrainerWorkspace(relationshipId)
+      if (workspace?.workout?.revisionId !== published.revisionId || workspace.workoutAssignmentVersion !== published.version) throw unverifiedChange()
       await refreshSources()
       setDirty(false)
       setComposerOpen(false)
-      setStatus('Published to client')
+      notify('Published to client')
     } catch (error) {
       if (error.status === 409) { await loadTrainerWorkspace(relationshipId).catch(() => {}); setPublishConflict(true) }
       setStatus(error.status === 409 ? `${error.message}. The latest schedule is shown; your draft is preserved.` : error.message)
     }
   }
+
+  const removePlan = () => confirmSheet({
+    title: 'Delete this client workout plan?',
+    message: 'Future unstarted workouts will be removed. Completed workout history stays available. You can assign a new plan later.',
+    confirmText: 'Delete plan',
+    danger: true,
+    onConfirm: async () => {
+      setRemovingPlan(true)
+      setStatus('Deleting workout plan…')
+      try {
+        const removed = await save(() => retryableCoachingMutation('/plans/remove', { relationshipId, expectedVersion: trainerWorkspace?.workout?.version }))
+        const workspace = await loadTrainerWorkspace(relationshipId)
+        if (!workspace || workspace.workout || workspace.workoutAssignmentVersion !== removed.version) throw unverifiedChange()
+        setDraftState(emptyWorkout())
+        setSelectedSource('blank')
+        setSourceTemplateId(null)
+        setSelectedTemplateId(null)
+        setTemplateName('')
+        setDirty(false)
+        setComposerOpen(true)
+        notify('Workout plan deleted')
+      } catch (error) {
+        if (error.status === 409) await loadTrainerWorkspace(relationshipId).catch(() => {})
+        setStatus(error.message)
+      } finally { setRemovingPlan(false) }
+    }
+  })
 
   const saveAsTemplate = async () => {
     if (!templateName.trim()) { setStatus('Name the reusable template first.'); return }
@@ -142,7 +195,7 @@ export default function WorkoutPlans() {
       await refreshSources()
       setSelectedTemplateId(created.id)
       setSourceTemplateId(created.id)
-      setStatus('Template saved')
+      notify('Template saved')
     } catch (error) { setStatus(error.message) }
   }
 
@@ -154,7 +207,7 @@ export default function WorkoutPlans() {
       await coachingMutation('/templates', { templateId: selected.id, expectedVersion: selected.version, name: templateName || selected.name, content: draft, archived }, { method: 'PUT' })
       await refreshSources()
       if (archived) { setSelectedTemplateId(null); setSourceTemplateId(null) }
-      setStatus(archived ? 'Template archived' : 'Template updated')
+      notify(archived ? 'Template archived' : 'Template updated')
     } catch (error) { setStatus(error.message) }
   }
 
@@ -166,11 +219,12 @@ export default function WorkoutPlans() {
     setStatus(`${labels[action]} session…`)
     try {
       const scheduledDate = moves[occurrence.id] || occurrence.scheduledDate
-      await coachingMutation(`/occurrences/${action}`, { occurrenceId: occurrence.id, expectedVersion: occurrence.version, ...(['move', 'restore'].includes(action) ? { scheduledDate } : {}), ...(action === 'customize' ? { prescription: null } : {}) })
-      await loadTrainerWorkspace(relationshipId)
+      const saved = await coachingMutation(`/occurrences/${action}`, { occurrenceId: occurrence.id, expectedVersion: occurrence.version, ...(['move', 'restore'].includes(action) ? { scheduledDate } : {}), ...(action === 'customize' ? { prescription: null } : {}) })
+      const workspace = await loadTrainerWorkspace(relationshipId)
+      if (!verifiedOccurrence(workspace, saved)) throw unverifiedChange()
       setMoves(current => { const next = { ...current }; delete next[occurrence.id]; return next })
       setManagedOccurrenceId(null)
-      setStatus(action === 'move' ? 'Workout rescheduled' : action === 'reset' ? 'Workout returned to its original date' : action === 'cancel' ? 'Day off saved' : action === 'customize' ? 'Workout returned to the recurring plan' : 'Workout restored')
+      notify(action === 'move' ? 'Workout rescheduled' : action === 'reset' ? 'Workout returned to its original date' : action === 'cancel' ? 'Day off saved' : action === 'customize' ? 'Workout returned to the recurring plan' : 'Workout restored')
     } catch (error) {
       if (error.status === 409) { await loadTrainerWorkspace(relationshipId).catch(() => {}); setOccurrenceConflicts(current => ({ ...current, [occurrence.id]: true })) }
       const message = error.status === 409 ? `${error.message}. Schedule reloaded.` : error.message
@@ -180,8 +234,10 @@ export default function WorkoutPlans() {
   }
 
   const openOccurrenceEditor = occurrence => {
+    if (!canEditWorkout(occurrence, dateInZone(new Date(), trainerWorkspace?.relationship?.timeZone || 'UTC'))) return
     setEditingOccurrence(occurrence)
     setOccurrenceEditDraft(occurrenceDraft(occurrence))
+    requestAnimationFrame(() => editorRef.current?.scrollIntoView({ block: 'start' }))
     setOccurrenceErrors(current => ({ ...current, [occurrence.id]: '' }))
   }
 
@@ -190,12 +246,13 @@ export default function WorkoutPlans() {
     setSavingOccurrenceId(editingOccurrence.id)
     setOccurrenceErrors(current => ({ ...current, [editingOccurrence.id]: '' }))
     try {
-      await coachingMutation('/occurrences/customize', { occurrenceId: editingOccurrence.id, expectedVersion: editingOccurrence.version, prescription: occurrencePrescription(occurrenceEditDraft) })
-      await loadTrainerWorkspace(relationshipId)
+      const saved = await coachingMutation('/occurrences/customize', { occurrenceId: editingOccurrence.id, expectedVersion: editingOccurrence.version, prescription: occurrencePrescription(occurrenceEditDraft) })
+      const workspace = await loadTrainerWorkspace(relationshipId)
+      if (!verifiedOccurrence(workspace, saved)) throw unverifiedChange()
       setEditingOccurrence(null)
       setOccurrenceEditDraft(null)
       setManagedOccurrenceId(null)
-      setStatus('This workout was customized for one day')
+      notify('This workout was customized for one day')
     } catch (error) {
       if (error.status === 409) { await loadTrainerWorkspace(relationshipId).catch(() => {}); setOccurrenceConflicts(current => ({ ...current, [editingOccurrence.id]: true })) }
       const message = error.status === 409 ? `${error.message}. Schedule reloaded; your edit is preserved.` : error.message
@@ -207,13 +264,30 @@ export default function WorkoutPlans() {
   const zone = trainerWorkspace?.relationship?.timeZone || 'UTC'
   const today = dateInZone(new Date(), zone)
   const groups = useMemo(() => {
-    const rows = trainerWorkspace?.workout?.occurrences || []
+    const rows = trainerWorkspace?.occurrences || trainerWorkspace?.workout?.occurrences || []
     return {
       upcoming: rows.filter(item => item.state === 'scheduled' && item.scheduledDate >= today).slice(0, 24),
       canceled: rows.filter(item => item.state === 'canceled' && item.cancellationReason === 'explicit' && item.scheduledDate >= today).slice(0, 24),
       past: rows.filter(item => item.scheduledDate < today || ['started', 'completed'].includes(item.state)).slice(-8).reverse()
     }
   }, [trainerWorkspace, today])
+
+  const rows = trainerWorkspace?.occurrences || trainerWorkspace?.workout?.occurrences || []
+  const viewedOccurrence = rows.find(item => item.id === viewedOccurrenceId)
+  const viewOccurrence = occurrence => {
+    setViewedOccurrenceId(occurrence.id)
+    requestAnimationFrame(() => detailsRef.current?.scrollIntoView({ block: 'start' }))
+  }
+  useEffect(() => {
+    const id = searchParams.get('occurrence')
+    const key = searchParams.toString()
+    if (!trainerWorkspace || !id || queryHandled.current === key) return
+    queryHandled.current = key
+    const occurrence = (trainerWorkspace.occurrences || trainerWorkspace.workout?.occurrences || []).find(item => item.id === id)
+    if (!occurrence) { setStatus('This workout is no longer available. Choose a workout from the schedule.'); return }
+    setViewedOccurrenceId(id)
+    if (searchParams.get('edit') === '1') openOccurrenceEditor(occurrence)
+  }, [trainerWorkspace, searchParams])
 
   const currentPlan = trainerWorkspace?.workout
   const revealComposer = ({ reloadCurrent = false } = {}) => {
@@ -229,11 +303,22 @@ export default function WorkoutPlans() {
     requestAnimationFrame(() => composerRef.current?.scrollIntoView({ block: 'start' }))
   }
 
+  if (!trainerWorkspace) return <CoachingShell mode="trainer" title="Workout plan" eyebrow="Client" action={<Button onClick={() => nav(`/studio/clients/${relationshipId}`)}>Back</Button>}>
+    <section className="coaching-panel"><p role={loadError ? 'alert' : 'status'}>{loadError || 'Loading client workout…'}</p></section>
+  </CoachingShell>
+
   return <CoachingShell mode="trainer" title="Workout plan" eyebrow={trainerWorkspace?.client?.name || 'Client'} action={<Button onClick={() => nav(`/studio/clients/${relationshipId}`)}>Back</Button>}>
     {currentPlan && <section className="coaching-panel coaching-current-plan">
-      <div><span className="coaching-kicker">Current plan</span><h2>{currentPlan.content.name}</h2><p>{currentPlan.content.days.length} training days · future unstarted workouts follow this recurring plan.</p></div>
-      <div className="coaching-actions"><Button onClick={() => revealComposer({ reloadCurrent: true })}>Edit recurring plan</Button><Button onClick={() => revealComposer()}>Use another plan</Button></div>
+      <div><span className="coaching-kicker">Current plan</span><h2>{currentPlan.content.name}</h2><p>{currentPlan.content.days.length} training {currentPlan.content.days.length === 1 ? 'day' : 'days'} · future unstarted workouts follow this recurring plan.</p></div>
+      <div className="coaching-actions"><Button onClick={() => revealComposer({ reloadCurrent: true })}>Edit recurring plan</Button><Button onClick={() => revealComposer()}>Use another plan</Button><Button variant="danger" disabled={removingPlan} onClick={removePlan}>{removingPlan ? 'Deleting…' : 'Delete workout plan'}</Button></div>
     </section>}
+
+    {viewedOccurrence && <div ref={detailsRef}><WorkoutDetails occurrence={viewedOccurrence} timeZone={zone} today={today} onEdit={trainerWorkspace.relationship.status === 'active' ? openOccurrenceEditor : undefined} onClose={() => {
+      setViewedOccurrenceId(null)
+      if (searchParams.has('occurrence')) { const next = new URLSearchParams(searchParams); next.delete('occurrence'); next.delete('edit'); setSearchParams(next, { replace: true }) }
+    }} /></div>}
+
+    {!currentPlan && !composerOpen && <section className="coaching-panel"><h2>No recurring plan</h2><p>One-time workouts are listed in the schedule below.</p><Button onClick={() => revealComposer()}>Assign recurring plan</Button></section>}
 
     {composerOpen && <div ref={composerRef} className="coaching-composer">
       <section className="coaching-panel coaching-template-bar">
@@ -248,26 +333,26 @@ export default function WorkoutPlans() {
             {recent.map(item => <option key={item.id} value={`recent:${item.id}`}>Recent: {item.planName} · {item.clientName}</option>)}
           </select>
           <Button onClick={loadSource}>Load source</Button>
-          {currentPlan && <Button onClick={() => setComposerOpen(false)}>Close editor</Button>}
+          {(currentPlan || rows.length > 0) && <Button onClick={() => setComposerOpen(false)}>Close editor</Button>}
         </div>
         <div className="coaching-actions"><input aria-label="Template name" placeholder="Reusable template name" value={templateName} onChange={event => setTemplateName(event.target.value)} /><Button onClick={saveAsTemplate}>Save as new</Button>{selectedTemplateId && <><Button onClick={() => updateTemplate(false)}>Update template</Button><Button onClick={() => confirmSheet({ title: 'Archive template?', message: 'Existing client assignments stay unchanged.', confirmText: 'Archive', danger: true, onConfirm: () => updateTemplate(true) })}>Archive</Button></>}</div>
       </section>
       <section className="coaching-panel">
-        <WorkoutPlanEditor value={draft} onChange={setDraft} />
+        <WorkoutPlanEditor value={draft} onChange={setDraft} onNotice={notify} />
         {publishConflict && <ConflictBanner message="Someone changed this client's schedule while you were editing. The latest schedule is shown; your draft is preserved." />}
         <div className="coaching-actions coaching-publish"><Button variant="primary" onClick={publish}>Publish to client</Button><span role="status">{status}{dirty ? ' · Draft has unpublished changes' : ''}</span></div>
       </section>
     </div>}
 
-    {currentPlan && <section className="coaching-panel"><h2>Schedule manager</h2><p>Use Manage to adjust one day. Started and completed workouts stay locked.</p>
-      <OccurrenceGroup title="Upcoming" empty="No upcoming workouts." rows={groups.upcoming} zone={zone} today={today} moves={moves} setMoves={setMoves} onAction={changeOccurrence} onEdit={openOccurrenceEditor} managedId={managedOccurrenceId} setManagedId={setManagedOccurrenceId} savingId={savingOccurrenceId} errors={occurrenceErrors} conflicts={occurrenceConflicts} />
-      <OccurrenceGroup title="Days off" empty="No upcoming days off." rows={groups.canceled} zone={zone} today={today} moves={moves} setMoves={setMoves} onAction={changeOccurrence} managedId={managedOccurrenceId} setManagedId={setManagedOccurrenceId} savingId={savingOccurrenceId} errors={occurrenceErrors} conflicts={occurrenceConflicts} />
-      <OccurrenceGroup title="Past / locked" empty="No past workouts yet." rows={groups.past} zone={zone} today={today} moves={moves} setMoves={setMoves} onAction={changeOccurrence} managedId={managedOccurrenceId} setManagedId={setManagedOccurrenceId} savingId={savingOccurrenceId} errors={occurrenceErrors} conflicts={occurrenceConflicts} />
+    {(currentPlan || rows.length > 0) && <section className="coaching-panel"><h2>Schedule manager</h2><p>Select a workout name to read its targets, or Manage to adjust one day. Started and completed workouts stay locked.</p>
+      <OccurrenceGroup title="Upcoming" empty="No upcoming workouts." onView={viewOccurrence} rows={groups.upcoming} zone={zone} today={today} moves={moves} setMoves={setMoves} onAction={changeOccurrence} onEdit={openOccurrenceEditor} managedId={managedOccurrenceId} setManagedId={setManagedOccurrenceId} savingId={savingOccurrenceId} errors={occurrenceErrors} conflicts={occurrenceConflicts} />
+      <OccurrenceGroup title="Days off" empty="No upcoming days off." onView={viewOccurrence} rows={groups.canceled} zone={zone} today={today} moves={moves} setMoves={setMoves} onAction={changeOccurrence} managedId={managedOccurrenceId} setManagedId={setManagedOccurrenceId} savingId={savingOccurrenceId} errors={occurrenceErrors} conflicts={occurrenceConflicts} />
+      <OccurrenceGroup title="Past / locked" empty="No past workouts yet." onView={viewOccurrence} rows={groups.past} zone={zone} today={today} moves={moves} setMoves={setMoves} onAction={changeOccurrence} managedId={managedOccurrenceId} setManagedId={setManagedOccurrenceId} savingId={savingOccurrenceId} errors={occurrenceErrors} conflicts={occurrenceConflicts} />
     </section>}
 
-    {editingOccurrence && occurrenceEditDraft && <section className="coaching-panel coaching-occurrence-editor-panel">
+    {editingOccurrence && occurrenceEditDraft && <section ref={editorRef} className="coaching-panel coaching-occurrence-editor-panel">
       <div className="coaching-panel-head"><div><span className="coaching-kicker">One-day change</span><h2>Edit {editingOccurrence.scheduledDate}</h2><p>Only this workout changes. The recurring plan and template stay unchanged.</p></div><Button onClick={() => { setEditingOccurrence(null); setOccurrenceEditDraft(null) }}>Close</Button></div>
-      <WorkoutPlanEditor value={occurrenceEditDraft} onChange={setOccurrenceEditDraft} singleDay />
+      <WorkoutPlanEditor value={occurrenceEditDraft} onChange={setOccurrenceEditDraft} onNotice={notify} singleDay />
       {occurrenceErrors[editingOccurrence.id] && (occurrenceConflicts[editingOccurrence.id]
         ? <ConflictBanner message={occurrenceErrors[editingOccurrence.id]} />
         : <p className="coaching-error" role="alert">{occurrenceErrors[editingOccurrence.id]}</p>)}
@@ -278,37 +363,17 @@ export default function WorkoutPlans() {
   </CoachingShell>
 }
 
-function occurrenceStatus(item) {
-  if (item.state === 'completed') return 'Completed'
-  if (item.state === 'started') return 'In progress'
-  if (item.state === 'canceled') return item.cancellationReason === 'explicit' ? 'Day off' : 'Removed by plan'
-  if (item.customized && item.overrideDate) return 'Customized · Rescheduled'
-  if (item.customized) return 'Customized'
-  if (item.overrideDate) return 'Rescheduled'
-  return 'Scheduled'
-}
-
-// Same derivation, mapped to StatusBadge's status vocabulary (FR-025) —
-// the label text above is untouched, this only picks the badge's icon/tone.
-function occurrenceStatusKey(item) {
-  if (item.state === 'completed') return 'completed'
-  if (item.state === 'started') return 'in-progress'
-  if (item.state === 'canceled') return 'day-off'
-  if (item.customized) return 'customized'
-  if (item.overrideDate) return 'rescheduled'
-  return 'scheduled'
-}
-
-function OccurrenceGroup({ title, empty, rows, zone, today, moves, setMoves, onAction, onEdit, managedId, setManagedId, savingId, errors, conflicts }) {
+function OccurrenceGroup({ title, empty, rows, zone, today, moves, setMoves, onAction, onEdit, onView, managedId, setManagedId, savingId, errors, conflicts }) {
   return <div className="coaching-schedule-group"><h3>{title}</h3>{!rows.length ? <p className="coaching-empty-inline">{empty}</p> : <div className="coaching-occurrence-list">{rows.map(item => {
     const mutable = item.scheduledDate >= today
+    const status = workoutStatus(item, today)
     const canceled = item.state === 'canceled'
     const explicit = item.cancellationReason === 'explicit'
     const managed = managedId === item.id
     const busy = savingId === item.id
     const targetDate = moves[item.id] || item.scheduledDate
     return <div key={item.id} className={managed ? 'managed' : ''}>
-      <div className="coaching-occurrence-summary"><span><strong>{item.prescription.dayName}</strong><small>{item.scheduledDate} · {zone}{item.overrideDate ? ` · moved from ${item.originalDate}` : ''}</small></span><StatusBadge status={occurrenceStatusKey(item)} label={occurrenceStatus(item)} /></div>
+      <div className="coaching-occurrence-summary"><span><button type="button" className="workout-details-link" onClick={() => onView(item)}>{item.prescription.dayName}</button><small>{item.scheduledDate} · {zone}{item.overrideDate ? ` · moved from ${item.originalDate}` : ''}</small></span><StatusBadge status={status.key} label={status.label} /></div>
       {mutable && (item.state === 'scheduled' || explicit) && <Button aria-expanded={managed} onClick={() => setManagedId(managed ? null : item.id)}>{managed ? 'Done' : 'Manage'}</Button>}
       {managed && <div className="coaching-occurrence-controls">
         {item.state === 'scheduled' && <>
@@ -316,7 +381,7 @@ function OccurrenceGroup({ title, empty, rows, zone, today, moves, setMoves, onA
           <label><span>Reschedule date</span><input aria-label={`Reschedule ${item.prescription.dayName}`} type="date" min={today} value={targetDate} onChange={event => setMoves(current => ({ ...current, [item.id]: event.target.value }))} /></label>
           <Button disabled={busy || targetDate === item.scheduledDate} onClick={() => onAction(item, 'move')}>Save new date</Button>
           {item.overrideDate && <Button disabled={busy} onClick={() => onAction(item, 'reset')}>Return to original date</Button>}
-          {item.customized && <Button disabled={busy} onClick={() => confirmSheet({ title: 'Return to the recurring workout?', message: 'This one-day customization will be removed and the current recurring workout will be used.', confirmText: 'Return to plan', onConfirm: () => onAction(item, 'customize') })}>Return workout to plan</Button>}
+          {item.customized && !item.oneTime && <Button disabled={busy} onClick={() => confirmSheet({ title: 'Return to the recurring workout?', message: 'This one-day customization will be removed and the current recurring workout will be used.', confirmText: 'Return to plan', onConfirm: () => onAction(item, 'customize') })}>Return workout to plan</Button>}
           <Button disabled={busy} onClick={() => confirmSheet({ title: 'Give this client a day off?', message: `${item.prescription.dayName} on ${item.scheduledDate} will become a day off and can be restored later.`, confirmText: 'Give day off', danger: true, onConfirm: () => onAction(item, 'cancel') })}>Give day off</Button>
         </>}
         {canceled && explicit && <>

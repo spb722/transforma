@@ -1,3 +1,4 @@
+import SessionFeedback from './components/coaching/SessionFeedback.jsx'
 import { useEffect, useRef, useState } from 'react'
 import { useStore } from './store/useStore.js'
 import { useUI } from './store/useUI.js'
@@ -22,7 +23,7 @@ import { nextPrescription, applyPrescription, policyFor, defaultIncrement, POLIC
 import { MOBILE, shareExport } from './lib/mobile.js'
 import { coachingApi, mutationId } from './lib/coaching/api.js'
 import { assignedOutbox } from './lib/coaching/outbox.js'
-import { assignedWorkoutFromSnapshot, resultPayload } from './lib/coaching/logger.js'
+import { assignedWorkoutFromSnapshot, resultPayload, assignedTargetLabel, assignedWorkoutResume } from './lib/coaching/logger.js'
 import ExerciseCatalogPicker from './components/ExerciseCatalogPicker.jsx'
 import { useCoachingStore } from './store/useCoachingStore.js'
 import { hasActiveCoachPlan } from './lib/coaching/schedule.js'
@@ -659,7 +660,8 @@ function WorkoutDetail({ w, close }) {
   const displayUnit = w.assignedPrescription?.unit || st.unit
   return <>
     <h3>{w.name}</h3>
-    <div className="muted small" style={{ marginBottom: 12 }}>{[fmtDate(w.d, true), ...durPart(w.end - w.start), fmtVol(w.vol, displayUnit), ...(w.bw ? [fmtNum(w.bw) + ' ' + displayUnit] : []), ...(w.assignedSessionId ? [w.assignedSync === 'synced' ? t('Coach assigned · synced') : t('Coach assigned · waiting to sync')] : [])].join(' · ')}</div>
+    <div className="muted small" style={{ marginBottom: 12 }}>{[fmtDate(w.d, true), ...durPart(w.end - w.start), fmtVol(w.vol ?? workoutVolume(w), displayUnit), ...(w.bw ? [fmtNum(w.bw) + ' ' + displayUnit] : []), ...(w.assignedSessionId ? [w.assignedSync === 'synced' ? t('Coach assigned · synced') : t('Coach assigned · waiting to sync')] : [])].join(' · ')}</div>
+    {w.assignedReceivedAt && <p className="small muted">{t('Server received')}: {new Date(w.assignedReceivedAt).toLocaleString()}</p>}
     {w.entries.map((e, i) => {
       const ex = EXIDX[e.id]
       return <div key={i} className="row" style={{ marginBottom: 12, alignItems: 'flex-start' }}>
@@ -668,6 +670,15 @@ function WorkoutDetail({ w, close }) {
           <div className="ss">{e.sets.filter(s => s.done).map(s => setLabel(e.id, s, e.target)).join('  ·  ') || t('no sets')}</div></div>
       </div>
     })}
+    {w.assignedPrescription && <div className="card small">
+      <strong>{t('Original prescribed workout')}</strong>
+      {w.assignedPrescription.exercises.map(exercise => <div key={exercise.entryId || exercise.id} style={{ marginTop: 10 }}>
+        <b>{exercise.name}</b>
+        {exercise.sets.map((set, index) => <div key={index}>{t('Set')} {index + 1}: {assignedTargetLabel(exercise, set, displayUnit)}</div>)}
+        <div className="muted">{exercise.restSec || 0}s {t('rest')}{exercise.notes ? ` · ${exercise.notes}` : ''}</div>
+      </div>)}
+    </div>}
+    {w.assignedSessionId && <SessionFeedback sessionId={w.assignedSessionId} />}
     {w.assignedSessionId ? <div className="card small muted">{t('Assigned results are read-only after synchronization so the trainer and client keep the same record.')}</div> : <Button variant="danger" onClick={() => confirmSheet({ title: t('Delete workout?'), message: t('This removes it from your history for good.'), confirmText: t('Delete'), danger: true, onConfirm: () => { update(s => { s.workouts = s.workouts.filter(x => x.id !== w.id) }); close(); toast(t('Workout deleted')) } })}>{t('Delete workout')}</Button>}
   </>
 }
@@ -692,7 +703,7 @@ function Calendar({ start, close }) {
   for (let d = 1; d <= daysIn; d++) {
     const iso = y + '-' + String(mo + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0')
     const ws = byDay[iso], effId = effectiveRoutineId(st, iso), ovr = st.dayPlan[iso] !== undefined
-    const coachOccurrence = coachPlanActive && ownWorkspace.workout.occurrences?.find(item => item.scheduledDate === iso)
+    const coachOccurrence = coachPlanActive && (ownWorkspace.occurrences || ownWorkspace.workout?.occurrences || []).find(item => item.scheduledDate === iso)
     const dotCls = ws ? 'done' : ['scheduled', 'started'].includes(coachOccurrence?.state) ? 'plan' : coachOccurrence?.state === 'canceled' ? 'ovr' : !coachPlanActive && ovr && effId ? 'ovr' : !coachPlanActive && effId ? 'plan' : ''
     cells.push(<button key={d} className={'cal-d' + (ws ? ' has' : '') + (iso === todayISO() ? ' today' : '')} onClick={() => {
       if (!ws) { if (!coachPlanActive) { close(); dayOverrideSheet(iso) }; return }
@@ -726,7 +737,7 @@ export function WorkoutRow({ w, onClick }) {
   return <div className="item" onClick={onClick}>
     <span className="lrow-i" style={{ width: 34, height: 34, borderRadius: 8, fontSize: 19 }}><Icon name={glyph} /></span>
     <div className="grow"><div className="tt">{w.name}</div>
-      <div className="ss">{[w.assignedSessionId ? t('Coach assigned') : null, fmtDate(w.d, true), ...durPart(w.end - w.start), t('{0} sets', setsDone(w)), fmtVol(w.vol, displayUnit), w.assignedSessionId ? (w.assignedSync === 'synced' ? t('synced') : t('waiting to sync')) : null].filter(Boolean).join(' · ')}</div></div>
+      <div className="ss">{[w.assignedSessionId ? t('Coach assigned') : null, fmtDate(w.d, true), ...durPart(w.end - w.start), t('{0} sets', setsDone(w)), fmtVol(w.vol ?? workoutVolume(w), displayUnit), w.assignedSessionId ? (w.assignedSync === 'synced' ? t('synced') : t('waiting to sync')) : null].filter(Boolean).join(' · ')}</div></div>
     {w.prs && w.prs.length > 0 && <span className="pr"><Icon name="trophy" />{w.prs.length} PR</span>}
     <Icon name="chevronRight" className="chev" />
   </div>
@@ -755,6 +766,13 @@ export function beginWorkout(routineId, bw) {
 export async function beginAssignedWorkout(occurrence) {
   const user = useStore.getState().user
   if (!user) throw new Error('Sign in to start an assigned workout')
+  const resumeLocal = () => {
+    if (useStore.getState().user?.id !== user.id) throw new Error('The signed-in profile changed. Open your workout again.')
+    const local = assignedWorkoutResume(S().active, occurrence)
+    if (local) { nav('/workout'); return true }
+    return false
+  }
+  if (resumeLocal()) return
   const workspace = useCoachingStore.getState().ownWorkspace
   let started = occurrence.state === 'started' && workspace?.startedSession?.occurrenceId === occurrence.id
     ? workspace.startedSession
@@ -765,8 +783,15 @@ export async function beginAssignedWorkout(occurrence) {
   }
   if (!started && occurrence.state === 'started') throw new Error('This workout is already in progress. Refresh and try Resume again.')
   if (!started) {
+    if (resumeLocal()) return
     const sessionId = mutationId()
     started = await coachingApi('/sessions/start', { method: 'POST', body: { sessionId, occurrenceId: occurrence.id, expectedOccurrenceVersion: occurrence.version } })
+  }
+  // A different workout or account may have opened while the request was pending.
+  if (resumeLocal()) return
+  if (started.state !== 'started') throw new Error('This workout has ended. Refresh your schedule to see its result.')
+  if (assignedOutbox.pending(user.id).some(item => item.sessionId === started.sessionId) || S().workouts.some(item => item.assignedSessionId === started.sessionId || item.id === started.sessionId)) {
+    throw new Error('This workout is already saved on this device. Reconnect to sync its result.')
   }
   const active = assignedWorkoutFromSnapshot(started.sessionId, started.prescriptionSnapshot)
   update(s => {
@@ -877,12 +902,17 @@ function FinishSummary({ w, prs, e1prs = [], close }) {
   const st = useStore(s => s.S)
   const displayUnit = w.assignedPrescription?.unit || st.unit
   const coachOn = !!useStore(s => s.config)?.coach?.enabled && !!st.coach?.consent?.agreedAt
+  const targetSets = w.assignedPrescription?.exercises?.reduce((total, exercise) => total + exercise.sets.length, 0)
+  const completedSets = setsDone(w)
+  const summaryTitle = targetSets == null || completedSets === targetSets ? t('Workout complete!')
+    : completedSets === 0 ? t('Empty attempt saved') : t('Partial workout saved')
   return <div style={{ textAlign: 'center', padding: '8px 0' }}>
     <div style={{ fontSize: 44, display: 'flex', justifyContent: 'center', color: 'var(--acc)' }}><Icon name="trophy" /></div>
-    <h3 style={{ margin: '8px 0' }}>{t('Workout complete!')}</h3>
+    <h3 style={{ margin: '8px 0' }}>{summaryTitle}</h3>
+    {targetSets != null && <p className="muted small">{completedSets}/{targetSets} {t('prescribed sets recorded')}</p>}
     <div className="bgrid bgrid-2" style={{ textAlign: 'left' }}>
       <div className="bcell"><div className="eyebrow">{t('Duration')}</div><div className="big" style={{ fontSize: 22 }}>{fmtDur(w.end - w.start)}</div></div>
-      <div className="bcell"><div className="eyebrow">{t('Volume')}</div><div className="big" style={{ fontSize: 22 }}>{fmtVol(w.vol, displayUnit)}</div></div>
+      <div className="bcell"><div className="eyebrow">{t('Volume')}</div><div className="big" style={{ fontSize: 22 }}>{fmtVol(w.vol ?? workoutVolume(w), displayUnit)}</div></div>
       <div className="bcell"><div className="eyebrow">{t('Sets')}</div><div className="big" style={{ fontSize: 22 }}>{setsDone(w)}</div></div>
       <div className="bcell"><div className="eyebrow">{t('PRs')}</div><div className="big" style={{ fontSize: 22, color: prs.length ? 'var(--trainer-text)' : undefined }}>{prs.length || '—'}</div></div>
     </div>
@@ -892,7 +922,7 @@ function FinishSummary({ w, prs, e1prs = [], close }) {
     </div>}
     <h4 className="sec" style={{ textAlign: 'left' }}>{t('What you just trained')}</h4>
     <BodyMap load={loadOfWorkouts([w])} body={st.body} />
-    {coachOn && <SessionRating w={w} />}
+    {w.assignedSessionId ? <SessionFeedback sessionId={w.assignedSessionId} /> : coachOn && <SessionRating w={w} />}
     <div style={{ height: 14 }} />
     <Button variant="primary" onClick={() => { close(); nav('/home') }}>{t('Nice!')}</Button>
   </div>

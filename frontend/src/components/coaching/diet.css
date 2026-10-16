@@ -4,6 +4,9 @@
 .coaching-diet-item{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .coaching-food{display:flex;justify-content:space-between;gap:15px;padding:12px 0;border-bottom:var(--hair) solid var(--coach-border)}
 .coaching-food span{color:var(--label-2)}
+.coaching-food>div{min-width:0;overflow-wrap:anywhere}
+.coaching-food>span{max-width:45%;overflow-wrap:anywhere}
+.coaching-food p{margin-top:5px}
 
 @media(max-width:520px){
   .coaching-diet-item{grid-template-columns:1fr}

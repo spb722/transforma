@@ -1,0 +1,23 @@
+.workout-details { scroll-margin-top: 24px; }
+.workout-details-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.workout-details-heading h2 { margin: 6px 0; }
+.workout-details-heading h2:focus { outline: none; }
+.workout-details-heading p { margin-top: 8px; color: var(--label-2); }
+.workout-details-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 12px 0 20px; color: var(--label-2); }
+.workout-details-exercises { list-style: none; padding: 0; margin: 0; }
+.workout-details-exercises > li { padding: 18px 0; border-top: 1px solid var(--coach-border, var(--sep)); }
+.workout-details-exercises h3 { margin: 0 0 8px; }
+.workout-details-rest { color: var(--label-2); margin: 0 0 12px; }
+.workout-details-sets { list-style: none; padding: 0; display: grid; gap: 4px; }
+.workout-details-sets li { display: flex; justify-content: space-between; gap: 20px; background: var(--surface-2); padding: 10px 12px; border-radius: 6px; }
+.workout-details-sets li > span { flex-shrink: 0; color: var(--label-2); }
+.workout-details-sets strong { text-align: right; overflow-wrap: anywhere; }
+.workout-details-notes { white-space: pre-wrap; line-height: 1.5; margin: 12px 0 0; }
+.workout-details-notes > strong { display: block; margin-bottom: 4px; }
+.workout-details-times { display: flex; flex-wrap: wrap; gap: 12px 28px; }
+.workout-details-times dt { color: var(--label-2); }
+.workout-details-times dd { margin: 4px 0 0; }
+.workout-details-notice { color: var(--label-2); line-height: 1.5; }
+.workout-details-link { display: inline; background: transparent; border: 0; padding: 4px 0; color: var(--label); text-align: left; font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.workout-details-link:hover { color: var(--trainer-text, var(--label)); }
+@media (max-width: 480px) { .workout-details-heading { flex-wrap: wrap; } }

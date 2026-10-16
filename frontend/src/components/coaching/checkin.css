@@ -7,10 +7,20 @@
 .coaching-inline{display:grid;grid-template-columns:1fr 100px;gap:8px}
 .coaching-response,.coaching-report{padding:16px;border-radius:var(--r);background:color-mix(in srgb, var(--trainer-text) 12%, var(--surface))}
 .coaching-response small{color:var(--label-2)}
+.coaching-checkin-history{display:grid;gap:12px}
+.coaching-report p,.coaching-response p{overflow-wrap:anywhere}
+.coaching-form [aria-invalid=true]{border-color:var(--red)}
 .coaching-subhead{margin-top:24px}
 .coaching-weight-list{display:grid;gap:6px;margin-top:12px}
-.coaching-weight-list>span{display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 0;border-bottom:var(--hair) solid var(--coach-border);font-size:13px}
-.coaching-weight-list small{color:var(--label-2)}
+.coaching-weight-list>span{display:grid;grid-template-columns:7.5em minmax(0,1fr) minmax(0,6em);gap:4px 12px;align-items:baseline;padding:10px 0;border-bottom:var(--hair) solid var(--coach-border);font-size:13px}
+.coaching-weight-list strong,.coaching-weight-list small{min-width:0;overflow-wrap:anywhere}
+.coaching-weight-list small{color:var(--label-2);text-align:right}
+
+@container coaching-main (max-width:440px){
+  .coaching-weight-list>span{grid-template-columns:minmax(0,1fr) minmax(0,6em)}
+  .coaching-weight-list strong{grid-column:1/-1;grid-row:2}
+  .coaching-weight-list small{grid-column:2;grid-row:1}
+}
 
 @media(max-width:420px){
   .coaching-adherence{grid-template-columns:1fr 1fr}

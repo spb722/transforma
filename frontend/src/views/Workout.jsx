@@ -16,6 +16,7 @@ import { nextPrescription, applyPrescription } from '../lib/progression.js'
 import { glyphOf } from '../lib/glyphs.js'
 import { useCoachingStore } from '../store/useCoachingStore.js'
 import { hasActiveCoachPlan, ownAssignmentSchedule } from '../lib/coaching/schedule.js'
+import { assignedTargetLabel } from '../lib/coaching/logger.js'
 
 /* ---------- start chooser (no active workout) ---------- */
 function StartChooser() {
@@ -32,6 +33,7 @@ function StartChooser() {
   const others = S.routines.filter(r => r !== todayR)
   if (coachPlanActive) return <div className="narrow">
     <div className="hdr"><div><h1>{t('Start workout')}</h1><div className="sub">{t('Follow your coach-assigned schedule')}</div></div></div>
+    {ownWorkspace.cachedAt && <p className="small dim">{t('Last refreshed')}: {new Date(ownWorkspace.cachedAt).toLocaleString()}</p>}
     {assignedToday ? <div className="card" style={{ borderColor: 'var(--trainer-text)' }}>
       <h2 className="accent">{assignedToday.state === 'started' ? t('Coach workout in progress') : t("Today's coach assignment")}</h2>
       <div className="row between" style={{ marginBottom: 12 }}><div><div className="big">{assignedToday.prescription.dayName}</div><div className="muted small">{assignedToday.prescription.planName} · {assignedToday.prescription.exercises.length} {t('exercises')} · {assignedToday.scheduledDate} · {ownWorkspace.relationship.timeZone}</div></div><span className="lrow-i"><Icon name="dumbbell" /></span></div>
@@ -128,21 +130,26 @@ function ExerciseBlock({ entryIdx, compact, locked, onToggle, onField, onAddSet,
   return <>
     <Media ex={ex} key={entry.id} compact={compact} minimizable />
     <div className="row between" style={{ marginBottom: 6 }}>
-      <div style={{ fontSize: compact ? 17 : 20, fontWeight: 600, letterSpacing: '-.02em', textTransform: 'capitalize', lineHeight: 1.2 }}>{ex.n}</div>
+      <div style={{ fontSize: compact ? 17 : 20, fontWeight: 600, letterSpacing: '-.02em', textTransform: 'capitalize', lineHeight: 1.2 }}>{locked ? entry.name || ex.n : ex.n}</div>
       <button className="iconbtn" aria-label={t('Details')} onClick={() => exerciseDetailSheet(ex)}><Icon name="info" /></button>
     </div>
     <div className="row" style={{ gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
       {cardio && <span className="tag acc"><Icon name="figureRun" />{t('Cardio')}</span>}
       {(ex.tg || ex.bp) && <span className="tag">{t(ex.tg || ex.bp)}</span>}
       {ex.eq && <span className="tag">{t(ex.eq)}</span>}
-      {best > 0 && <span className="tag nocap">{t('Best:')} {fmtNum(best)} {displayUnit}</span>}
+      {!locked && best > 0 && <span className="tag nocap">{t('Best:')} {fmtNum(best)} {displayUnit}</span>}
     </div>
-    {last && <div className="small dim" style={{ marginBottom: 4 }}>{t('Last time')} ({fmtDate(last.d)}): {last.sets.map(s => setLabel(entry.id, s, last.target)).join(', ')}</div>}
+    {!locked && last && <div className="small dim" style={{ marginBottom: 4 }}>{t('Last time')} ({fmtDate(last.d)}): {last.sets.map(s => setLabel(entry.id, s, last.target)).join(', ')}</div>}
     {plan && plan.why && plan.kind !== 'off' && <div className={'progline' + (plan.kind === 'deload' ? ' warn' : '')}>
       <Icon name={plan.kind === 'up' ? 'arrowUp' : plan.kind === 'deload' ? 'arrowDown' : 'lightbulb'} />
       <span>{t(...plan.why)}</span>
     </div>}
     {entry.target?.notes && <div className="card small" style={{ margin: '8px 0' }}><strong>{t('Coach note')}</strong><div className="muted">{entry.target.notes}</div></div>}
+    {locked && <div className="card small" style={{ margin: '8px 0' }}>
+      <strong>{t('Prescribed targets')}</strong>
+      {(entry.target?.sets || []).map((set, index) => <div key={index}>{t('Set')} {index + 1}: {assignedTargetLabel(entry.target, set, displayUnit)}</div>)}
+      <div className="muted">{entry.target?.restSec || 0}s {t('rest')} · {t('Record your actual performance below.')}</div>
+    </div>}
     <div className="card" style={{ marginTop: 10, marginBottom: 0 }}>
       {/* the header carries the same eff3 sizing as the rows, or the labels drift off their columns */}
       <div className={'sethead' + (col3 ? ' eff3' : '')}><span className="n-sp" /><span className="w-sp">{col1.hd}</span><span className="r-sp">{col2.hd}</span>{col3 && <span className="eff-sp">{col3.hd}</span>}{timed && <span className="ck-sp" />}<span className="ck-sp" /></div>

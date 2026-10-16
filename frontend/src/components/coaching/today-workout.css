@@ -1,0 +1,15 @@
+.today-workout{border-left:4px solid var(--trainer-text);padding:24px 26px}
+.today-workout-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.today-workout .today-workout-eyebrow{font-size:11px;text-transform:uppercase;font-weight:800;letter-spacing:.12em;color:var(--trainer-text);margin:0}
+.today-workout .today-workout-date{font-size:13px;margin-top:7px}
+.today-workout-status{background:var(--surface-2);padding:7px 11px;border-radius:var(--r);font-size:12px;font-weight:750;max-width:100%}
+.today-workout-status-scheduled,.today-workout-status-in_progress,.today-workout-status-started,.today-workout-status-completed{background:color-mix(in srgb,var(--trainer-text) 14%,var(--surface));color:var(--trainer-text)}
+.today-workout h2{font-size:clamp(23px,3vw,32px);line-height:1.2}
+.today-workout-name{text-align:left;color:inherit;font:inherit;min-height:44px;overflow-wrap:anywhere;text-decoration:underline;text-decoration-color:var(--sep);text-underline-offset:6px}
+.today-workout-name:hover{text-decoration-color:var(--trainer-text)}
+.today-workout-times{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:18px;color:var(--label-2);font-size:12px}
+.today-workout-times strong{display:block;color:var(--label);font-size:14px;margin-top:4px;font-weight:600}
+.today-workout-actions{margin-top:20px}
+.today-workout-actions:empty{display:none}
+.coaching-schedule-name{text-align:left;min-height:44px;color:var(--trainer-text);font-weight:700;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+@media(max-width:480px){.today-workout{padding:20px 18px}.today-workout-actions>.btn{flex:1 1 100%}}

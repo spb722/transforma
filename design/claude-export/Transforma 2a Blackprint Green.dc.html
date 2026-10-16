@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/modernist-280b4eed-62cd-45c3-b187-c6ccb79bc6f2/styles.css">
+<script src="_ds/modernist-280b4eed-62cd-45c3-b187-c6ccb79bc6f2/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script>
+<script src="_ds/modernist-280b4eed-62cd-45c3-b187-c6ccb79bc6f2/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap">
+<style>
+  body { margin: 0; background: #cfcdcb; }
+  a { color: var(--color-accent); }
+  a:hover { color: var(--color-accent-700); }
+</style>
+</helmet>
+
+<section style="padding:64px;display:flex;flex-direction:column;gap:48px;font-family:var(--font-body);color:var(--color-text)">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:900px">
+    <div style="font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#0a6b43">transforma · approved visual direction</div>
+    <div style="font-size:44px;font-weight:800;line-height:1.05;letter-spacing:-.02em">Blackprint, green</div>
+    <div style="font-size:16px;max-width:66ch">The signed-off direction, twelve mobile screens and the desktop adaptation. Ink ground, 2px rules, zero radius, green reserved for the primary action and for anything the trainer authored. Appearance is a client setting: ink is the default, paper is available, and the in-session screen stays ink in both so it reads at arm's length in gym lighting.</div>
+  </div>
+
+  <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Accent</div>
+      <div style="display:flex">
+        <div style="width:72px;height:56px;background:#e4faef"></div>
+        <div style="width:72px;height:56px;background:#3ecb8e"></div>
+        <div style="width:72px;height:56px;background:#10a86a"></div>
+        <div style="width:72px;height:56px;background:#0a6b43"></div>
+        <div style="width:72px;height:56px;background:#05301e"></div>
+      </div>
+      <div style="font-size:12px;color:var(--color-neutral-700)">Fills use #0a6b43 with white type (5.9:1). #3ecb8e is the accent for text on ink; #0a6b43 for text on the light ground.</div>
+    </div>
+  </div>
+
+  <!-- ===== ROW 1: core three, dark ===== -->
+  <div style="display:flex;gap:28px;flex-wrap:wrap">
+
+    <!-- HOME -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Client home</div>
+      <div data-screen-label="2a Home" style="width:390px;height:844px;overflow:hidden;position:relative;background:var(--color-text);color:var(--color-bg)">
+        <div style="padding:20px 20px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)">
+            <div>transforma</div>
+            <div style="display:flex;align-items:center;gap:6px;color:#3ecb8e"><i data-lucide="shield-check" style="width:16px;height:16px"></i><span>On device</span></div>
+          </div>
+          <div style="height:2px;background:var(--color-neutral-600);margin:12px 0 18px"></div>
+          <div style="font-size:36px;font-weight:800;line-height:1;letter-spacing:-.025em">Hi test_1</div>
+          <div style="font-size:15px;color:var(--color-neutral-400);margin-top:4px">Monday 14 September</div>
+
+          <div style="margin-top:22px;background:#0a6b43;color:#fff;padding:18px 18px 20px">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:800"><i data-lucide="user-round-check" style="width:16px;height:16px"></i><span>Today · given by your trainer</span></div>
+            <div style="font-size:40px;font-weight:800;line-height:1;letter-spacing:-.03em;margin-top:10px">Day Off</div>
+            <div style="font-size:14px;margin-top:10px;opacity:.9">2026-09-14 · Asia/Calcutta</div>
+            <div style="margin-top:16px;background:#fff;color:#0a6b43;font-weight:800;font-size:15px;padding:14px;min-height:48px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between"><span>View coach schedule</span><i data-lucide="arrow-right" style="width:18px;height:18px"></i></div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:22px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)">
+            <div style="min-height:32px;display:flex;align-items:center;gap:4px"><i data-lucide="chevron-left" style="width:16px;height:16px"></i><span>Prev</span></div>
+            <div style="color:var(--color-bg)">This week</div>
+            <div style="min-height:32px;display:flex;align-items:center;gap:4px"><span>Next</span><i data-lucide="chevron-right" style="width:16px;height:16px"></i></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:10px">
+            <div style="background:var(--color-bg);color:var(--color-text);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;font-weight:700">MO</div><div style="font-size:18px;font-weight:800">14</div><div style="font-size:9px;letter-spacing:.06em;font-weight:800;color:#0a6b43">OFF</div></div>
+            <div style="background:var(--color-neutral-900);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;color:var(--color-neutral-400)">TU</div><div style="font-size:18px;font-weight:700">15</div><div style="font-size:9px;color:var(--color-neutral-500)">—</div></div>
+            <div style="background:var(--color-neutral-900);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;color:var(--color-neutral-400)">WE</div><div style="font-size:18px;font-weight:700">16</div><div style="font-size:9px;letter-spacing:.06em;font-weight:800;color:#3ecb8e">PULL</div></div>
+            <div style="background:var(--color-neutral-900);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;color:var(--color-neutral-400)">TH</div><div style="font-size:18px;font-weight:700">17</div><div style="font-size:9px;color:var(--color-neutral-500)">—</div></div>
+            <div style="background:var(--color-neutral-900);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;color:var(--color-neutral-400)">FR</div><div style="font-size:18px;font-weight:700">18</div><div style="font-size:9px;letter-spacing:.06em;font-weight:800;color:#3ecb8e">OFF</div></div>
+            <div style="background:var(--color-neutral-900);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;color:var(--color-neutral-400)">SA</div><div style="font-size:18px;font-weight:700">19</div><div style="font-size:9px;color:var(--color-neutral-500)">—</div></div>
+            <div style="background:var(--color-neutral-900);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;color:var(--color-neutral-400)">SU</div><div style="font-size:18px;font-weight:700">20</div><div style="font-size:9px;color:var(--color-neutral-500)">—</div></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:22px">
+            <div style="background:var(--color-neutral-900);padding:16px">
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)"><i data-lucide="flame" style="width:14px;height:14px"></i><span>Week streak</span></div>
+              <div style="font-size:44px;font-weight:800;line-height:1;margin-top:6px">1</div>
+              <div style="font-size:13px;color:var(--color-neutral-400)">0 / 3 this week</div>
+            </div>
+            <div style="background:var(--color-neutral-900);padding:16px">
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)"><i data-lucide="dumbbell" style="width:14px;height:14px"></i><span>Workouts</span></div>
+              <div style="font-size:44px;font-weight:800;line-height:1;margin-top:6px">1</div>
+              <div style="font-size:13px;color:var(--color-neutral-400)">total · view calendar</div>
+            </div>
+          </div>
+
+          <div style="background:var(--color-neutral-900);padding:16px;margin-top:2px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)"><i data-lucide="scale" style="width:14px;height:14px"></i><span>Body weight</span></div>
+              <div style="display:flex;gap:16px;font-size:14px;font-weight:800;color:#3ecb8e"><div style="min-height:44px;display:flex;align-items:center">Goal</div><div style="min-height:44px;display:flex;align-items:center;gap:4px"><i data-lucide="plus" style="width:16px;height:16px"></i><span>Log</span></div></div>
+            </div>
+            <div style="font-size:14px;color:var(--color-neutral-300);text-wrap:pretty">No entries yet — log your weight to start the curve. It's also asked before every workout.</div>
+          </div>
+        </div>
+
+        <div style="position:absolute;left:0;right:0;bottom:0;background:var(--color-text);border-top:2px solid var(--color-neutral-600);display:grid;grid-template-columns:repeat(5,1fr)">
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:#3ecb8e;border-top:4px solid #10a86a;margin-top:-2px"><i data-lucide="house" style="width:20px;height:20px"></i><span>Home</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-400)"><i data-lucide="calendar-days" style="width:20px;height:20px"></i><span>Plan</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800"><i data-lucide="play" style="width:20px;height:20px"></i><span>Start</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-400)"><i data-lucide="trending-up" style="width:20px;height:20px"></i><span>Stats</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-400)"><i data-lucide="list" style="width:20px;height:20px"></i><span>Exercises</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAN -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Coach-assigned plan</div>
+      <div data-screen-label="2a Plan" style="width:390px;height:844px;overflow:hidden;position:relative;background:var(--color-text);color:var(--color-bg)">
+        <div style="padding:20px 20px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)"><div>transforma</div><div style="display:flex;align-items:center;gap:6px;color:#3ecb8e"><i data-lucide="shield-check" style="width:16px;height:16px"></i><span>On device</span></div></div>
+          <div style="height:2px;background:var(--color-neutral-600);margin:12px 0 18px"></div>
+          <div style="font-size:36px;font-weight:800;line-height:1;letter-spacing:-.025em">Plan</div>
+          <div style="font-size:15px;color:var(--color-neutral-400);margin-top:4px">Your coach-assigned schedule</div>
+
+          <div style="margin-top:18px;background:var(--color-neutral-900);padding:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+            <div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#3ecb8e"><i data-lucide="user-round-check" style="width:14px;height:14px"></i><span>Coach-assigned plan</span></div>
+              <div style="font-size:28px;font-weight:800;letter-spacing:-.02em;margin-top:2px">Starter PPL</div>
+              <div style="font-size:13px;color:var(--color-neutral-300);margin-top:4px">Your trainer manages this plan and its schedule.</div>
+            </div>
+            <div style="border:2px solid var(--color-neutral-500);padding:4px 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;white-space:nowrap;color:var(--color-neutral-300);display:flex;align-items:center;gap:4px"><i data-lucide="lock" style="width:12px;height:12px"></i><span>Read only</span></div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:20px;padding-bottom:8px;border-bottom:2px solid var(--color-bg)">
+            <div style="font-size:18px;font-weight:800;letter-spacing:-.01em">Push Day</div>
+            <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-400)">Monday</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:2px">
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center"><div style="font-size:15px;font-weight:600">barbell bench press</div><div style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap">4×8</div></div>
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center"><div style="font-size:15px;font-weight:600">barbell incline bench press</div><div style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap">3×10</div></div>
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center"><div style="font-size:15px;font-weight:600">dumbbell standing overhead press</div><div style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap">3×10</div></div>
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center"><div style="font-size:15px;font-weight:600">dumbbell lateral raise</div><div style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap">3×12</div></div>
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center"><div style="font-size:15px;font-weight:600">cable triceps pushdown (v-bar)</div><div style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap">3×12</div></div>
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center"><div style="font-size:15px;font-weight:600">chest dip</div><div style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap">3×10</div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--color-neutral-400);margin-top:6px"><span>All sets rest 90s · targets are your trainer's.</span><span style="white-space:nowrap">Pull Day below ↓</span></div>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;background:var(--color-text);border-top:2px solid var(--color-neutral-600);display:grid;grid-template-columns:repeat(5,1fr)">
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-400)"><i data-lucide="house" style="width:20px;height:20px"></i><span>Home</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:#3ecb8e;border-top:4px solid #10a86a;margin-top:-2px"><i data-lucide="calendar-days" style="width:20px;height:20px"></i><span>Plan</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800"><i data-lucide="play" style="width:20px;height:20px"></i><span>Start</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-400)"><i data-lucide="trending-up" style="width:20px;height:20px"></i><span>Stats</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-400)"><i data-lucide="list" style="width:20px;height:20px"></i><span>Exercises</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVE -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Active workout</div>
+      <div data-screen-label="2a Active workout" style="width:390px;height:844px;overflow:hidden;position:relative;background:var(--color-text);color:var(--color-bg)">
+        <div style="padding:20px 20px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800"><div style="display:flex;align-items:center;gap:6px;color:#3ecb8e"><i data-lucide="circle-dot" style="width:14px;height:14px"></i><span>Session live</span></div><div style="font-variant-numeric:tabular-nums">00:42:11</div></div>
+          <div style="height:2px;background:var(--color-neutral-600);margin:12px 0 18px"></div>
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400)">Push Day · exercise 1 of 6</div>
+          <div style="font-size:30px;font-weight:800;line-height:1.05;letter-spacing:-.02em;margin-top:6px">barbell bench press</div>
+
+          <div style="display:flex;gap:2px;margin-top:18px">
+            <div style="flex:1;background:var(--color-neutral-900);padding:14px"><div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-400)">Set</div><div style="font-size:34px;font-weight:800;line-height:1">3<span style="font-size:18px;color:var(--color-neutral-400)">/4</span></div></div>
+            <div style="flex:1;background:var(--color-neutral-900);padding:14px"><div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-400)">Target</div><div style="font-size:34px;font-weight:800;line-height:1">8<span style="font-size:18px;color:var(--color-neutral-400)"> reps</span></div></div>
+            <div style="flex:1;background:#0a6b43;color:#fff;padding:14px"><div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase">Rest</div><div style="font-size:34px;font-weight:800;line-height:1">90<span style="font-size:18px">s</span></div></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:2px">
+            <div style="background:var(--color-bg);color:var(--color-text);padding:14px"><div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Weight kg</div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px"><div style="width:44px;height:44px;border:2px solid var(--color-text);display:flex;align-items:center;justify-content:center"><i data-lucide="minus" style="width:20px;height:20px"></i></div><div style="font-size:30px;font-weight:800;font-variant-numeric:tabular-nums">62.5</div><div style="width:44px;height:44px;border:2px solid var(--color-text);display:flex;align-items:center;justify-content:center"><i data-lucide="plus" style="width:20px;height:20px"></i></div></div></div>
+            <div style="background:var(--color-bg);color:var(--color-text);padding:14px"><div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Reps</div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px"><div style="width:44px;height:44px;border:2px solid var(--color-text);display:flex;align-items:center;justify-content:center"><i data-lucide="minus" style="width:20px;height:20px"></i></div><div style="font-size:30px;font-weight:800;font-variant-numeric:tabular-nums">8</div><div style="width:44px;height:44px;border:2px solid var(--color-text);display:flex;align-items:center;justify-content:center"><i data-lucide="plus" style="width:20px;height:20px"></i></div></div></div>
+          </div>
+
+          <div style="margin-top:2px;background:#0a6b43;color:#fff;font-weight:800;font-size:19px;padding:20px;min-height:64px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between"><div>Log set 3</div><div style="display:flex;align-items:center;gap:8px;font-size:14px;opacity:.9"><span>then rest 90s</span><i data-lucide="arrow-right" style="width:18px;height:18px"></i></div></div>
+
+          <div style="margin-top:20px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400);padding-bottom:8px;border-bottom:2px solid var(--color-neutral-600)">This exercise</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:2px">
+            <div style="background:var(--color-neutral-900);padding:10px 14px;display:flex;justify-content:space-between;font-size:15px;font-variant-numeric:tabular-nums"><div style="font-weight:700">Set 1</div><div>60 kg × 8</div><div style="color:#3ecb8e;font-weight:800;display:flex;align-items:center;gap:4px"><i data-lucide="check" style="width:16px;height:16px"></i><span>Logged</span></div></div>
+            <div style="background:var(--color-neutral-900);padding:10px 14px;display:flex;justify-content:space-between;font-size:15px;font-variant-numeric:tabular-nums"><div style="font-weight:700">Set 2</div><div>60 kg × 8</div><div style="color:#3ecb8e;font-weight:800;display:flex;align-items:center;gap:4px"><i data-lucide="check" style="width:16px;height:16px"></i><span>Logged</span></div></div>
+            <div style="background:var(--color-neutral-900);padding:10px 14px;display:flex;justify-content:space-between;font-size:15px;color:var(--color-neutral-400);font-variant-numeric:tabular-nums"><div style="font-weight:700">Set 4</div><div>— × 8</div><div>Pending</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-neutral-400);margin-top:12px"><i data-lucide="chevrons-right" style="width:16px;height:16px"></i><span>Up next · barbell incline bench press 3×10</span></div>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;background:var(--color-bg);color:var(--color-text);display:flex;justify-content:space-between;align-items:center;padding:16px 20px 20px"><div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800">Session in progress</div><div style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#0a6b43;display:flex;align-items:center;gap:6px"><i data-lucide="square-check" style="width:16px;height:16px"></i><span>Finish</span></div></div>
+      </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Workout summary</div>
+      <div data-screen-label="2a Summary" style="width:390px;height:844px;overflow:hidden;position:relative;background:var(--color-text);color:var(--color-bg)">
+        <div style="background:#0a6b43;color:#fff;padding:20px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:800"><i data-lucide="check-check" style="width:16px;height:16px"></i><span>Session complete</span></div>
+          <div style="font-size:38px;font-weight:800;line-height:1;letter-spacing:-.03em;margin-top:14px">Push Day</div>
+          <div style="font-size:14px;margin-top:8px;opacity:.92">Monday 14 September · 58 min · 6 exercises · 19 sets</div>
+        </div>
+        <div style="padding:20px">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px">
+            <div style="background:var(--color-neutral-900);padding:14px"><div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-400)">Volume</div><div style="font-size:26px;font-weight:800;line-height:1.1">7,340<span style="font-size:14px;color:var(--color-neutral-400)"> kg</span></div></div>
+            <div style="background:var(--color-neutral-900);padding:14px"><div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-400)">Sets</div><div style="font-size:26px;font-weight:800;line-height:1.1">19<span style="font-size:14px;color:var(--color-neutral-400)">/19</span></div></div>
+            <div style="background:var(--color-neutral-900);padding:14px"><div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-400)">PRs</div><div style="font-size:26px;font-weight:800;line-height:1.1;color:#3ecb8e">2</div></div>
+          </div>
+
+          <div style="margin-top:20px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400);padding-bottom:8px;border-bottom:2px solid var(--color-neutral-600)">What you logged</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:2px">
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center"><div style="font-size:14px;font-weight:600">barbell bench press</div><div style="font-size:13px;font-variant-numeric:tabular-nums;color:#3ecb8e;font-weight:800">62.5 × 8 PR</div></div>
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center"><div style="font-size:14px;font-weight:600">barbell incline bench press</div><div style="font-size:13px;font-variant-numeric:tabular-nums;color:var(--color-neutral-300)">45 × 10</div></div>
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center"><div style="font-size:14px;font-weight:600">dumbbell standing overhead press</div><div style="font-size:13px;font-variant-numeric:tabular-nums;color:var(--color-neutral-300)">20 × 10</div></div>
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center"><div style="font-size:14px;font-weight:600">dumbbell lateral raise</div><div style="font-size:13px;font-variant-numeric:tabular-nums;color:#3ecb8e;font-weight:800">12 × 12 PR</div></div>
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center"><div style="font-size:14px;font-weight:600">cable triceps pushdown (v-bar)</div><div style="font-size:13px;font-variant-numeric:tabular-nums;color:var(--color-neutral-300)">30 × 12</div></div>
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center"><div style="font-size:14px;font-weight:600">chest dip</div><div style="font-size:13px;font-variant-numeric:tabular-nums;color:var(--color-neutral-300)">bodyweight × 10</div></div>
+          </div>
+
+          <div style="background:var(--color-neutral-900);padding:14px;margin-top:14px">
+            <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400)">Note for your trainer</div>
+            <div style="font-size:14px;color:var(--color-neutral-300);margin-top:6px">Optional · shared only with your coach when you send it.</div>
+          </div>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;display:flex;gap:2px;padding:0 20px 20px">
+          <div style="flex:1;background:var(--color-bg);color:var(--color-text);font-weight:800;font-size:16px;padding:16px;min-height:56px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between"><span>Save session</span><i data-lucide="arrow-right" style="width:18px;height:18px"></i></div>
+          <div style="background:var(--color-neutral-900);color:var(--color-bg);font-weight:800;font-size:15px;padding:16px;min-height:56px;box-sizing:border-box;display:flex;align-items:center">Discard</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ROW 2 ===== -->
+  <div style="display:flex;gap:28px;flex-wrap:wrap">
+
+    <!-- STATS -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Stats / progress</div>
+      <div data-screen-label="2a Stats" style="width:390px;height:844px;overflow:hidden;position:relative;background:var(--color-text);color:var(--color-bg)">
+        <div style="padding:20px 20px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)"><div>transforma</div><div style="display:flex;align-items:center;gap:6px;color:#3ecb8e"><i data-lucide="shield-check" style="width:16px;height:16px"></i><span>On device</span></div></div>
+          <div style="height:2px;background:var(--color-neutral-600);margin:12px 0 18px"></div>
+          <div style="font-size:36px;font-weight:800;line-height:1;letter-spacing:-.025em">Stats</div>
+          <div style="font-size:15px;color:var(--color-neutral-400);margin-top:4px">Computed on this device only</div>
+
+          <div style="display:flex;gap:2px;margin-top:18px">
+            <div style="flex:1;background:var(--color-bg);color:var(--color-text);padding:10px;text-align:center;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">8 weeks</div>
+            <div style="flex:1;background:var(--color-neutral-900);padding:10px;text-align:center;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-300)">6 months</div>
+            <div style="flex:1;background:var(--color-neutral-900);padding:10px;text-align:center;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-300)">All time</div>
+          </div>
+
+          <div style="background:var(--color-neutral-900);padding:16px;margin-top:2px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400)">Sessions per week</div><div style="font-size:13px;color:var(--color-neutral-300)">target 3</div></div>
+            <div style="display:flex;align-items:flex-end;gap:6px;height:120px;margin-top:14px">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:33%;background:var(--color-neutral-600)"></div><div style="font-size:10px;color:var(--color-neutral-400)">W1</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:66%;background:var(--color-neutral-600)"></div><div style="font-size:10px;color:var(--color-neutral-400)">W2</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:100%;background:#10a86a"></div><div style="font-size:10px;color:var(--color-neutral-400)">W3</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:66%;background:var(--color-neutral-600)"></div><div style="font-size:10px;color:var(--color-neutral-400)">W4</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:100%;background:#10a86a"></div><div style="font-size:10px;color:var(--color-neutral-400)">W5</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:66%;background:var(--color-neutral-600)"></div><div style="font-size:10px;color:var(--color-neutral-400)">W6</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:33%;background:var(--color-neutral-600)"></div><div style="font-size:10px;color:var(--color-neutral-400)">W7</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:33%;background:var(--color-neutral-600)"></div><div style="font-size:10px;color:var(--color-neutral-400)">W8</div></div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:2px">
+            <div style="background:var(--color-neutral-900);padding:16px"><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)">Total volume</div><div style="font-size:32px;font-weight:800;line-height:1.1;margin-top:4px">54.2<span style="font-size:15px;color:var(--color-neutral-400)"> t</span></div></div>
+            <div style="background:var(--color-neutral-900);padding:16px"><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)">Adherence</div><div style="font-size:32px;font-weight:800;line-height:1.1;margin-top:4px;color:#3ecb8e">78<span style="font-size:15px">%</span></div></div>
+          </div>
+
+          <div style="margin-top:20px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400);padding-bottom:8px;border-bottom:2px solid var(--color-neutral-600)">Personal records</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:2px">
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;gap:10px"><div style="font-size:14px;font-weight:600">barbell bench press</div><div style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums">62.5 kg</div></div>
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;gap:10px"><div style="font-size:14px;font-weight:600">barbell bent over row</div><div style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums">70 kg</div></div>
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;gap:10px"><div style="font-size:14px;font-weight:600">barbell back squat</div><div style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums">85 kg</div></div>
+          </div>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;background:var(--color-text);border-top:2px solid var(--color-neutral-600);display:grid;grid-template-columns:repeat(5,1fr)">
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-400)"><i data-lucide="house" style="width:20px;height:20px"></i><span>Home</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-400)"><i data-lucide="calendar-days" style="width:20px;height:20px"></i><span>Plan</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800"><i data-lucide="play" style="width:20px;height:20px"></i><span>Start</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:#3ecb8e;border-top:4px solid #10a86a;margin-top:-2px"><i data-lucide="trending-up" style="width:20px;height:20px"></i><span>Stats</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-400)"><i data-lucide="list" style="width:20px;height:20px"></i><span>Exercises</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXERCISE LIBRARY -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Exercise library</div>
+      <div data-screen-label="2a Exercises" style="width:390px;height:844px;overflow:hidden;position:relative;background:var(--color-text);color:var(--color-bg)">
+        <div style="padding:20px 20px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)"><div>transforma</div><div style="display:flex;align-items:center;gap:6px;color:#3ecb8e"><i data-lucide="shield-check" style="width:16px;height:16px"></i><span>On device</span></div></div>
+          <div style="height:2px;background:var(--color-neutral-600);margin:12px 0 18px"></div>
+          <div style="font-size:36px;font-weight:800;line-height:1;letter-spacing:-.025em">Exercises</div>
+          <div style="font-size:15px;color:var(--color-neutral-400);margin-top:4px">1,240 movements · offline catalogue</div>
+
+          <div style="margin-top:16px;border:2px solid var(--color-neutral-500);display:flex;align-items:center;gap:10px;padding:12px 14px;min-height:48px;box-sizing:border-box;color:var(--color-neutral-400)"><i data-lucide="search" style="width:18px;height:18px"></i><span style="font-size:15px">Search movement or muscle</span></div>
+
+          <div style="display:flex;gap:2px;margin-top:2px;flex-wrap:wrap">
+            <div style="background:var(--color-bg);color:var(--color-text);padding:8px 12px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase">All</div>
+            <div style="background:var(--color-neutral-900);padding:8px 12px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--color-neutral-300)">Chest</div>
+            <div style="background:var(--color-neutral-900);padding:8px 12px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--color-neutral-300)">Back</div>
+            <div style="background:var(--color-neutral-900);padding:8px 12px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--color-neutral-300)">Legs</div>
+            <div style="background:var(--color-neutral-900);padding:8px 12px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--color-neutral-300)">Arms</div>
+          </div>
+
+          <div style="margin-top:18px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400);padding-bottom:8px;border-bottom:2px solid var(--color-neutral-600)">In your plan</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:2px">
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-size:15px;font-weight:600">barbell bench press</div><div style="font-size:12px;color:var(--color-neutral-400)">chest · barbell</div></div><div style="font-size:13px;font-weight:800;color:#3ecb8e;font-variant-numeric:tabular-nums">62.5 kg</div></div>
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-size:15px;font-weight:600">barbell incline bench press</div><div style="font-size:12px;color:var(--color-neutral-400)">chest · barbell</div></div><div style="font-size:13px;font-weight:800;color:#3ecb8e;font-variant-numeric:tabular-nums">45 kg</div></div>
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-size:15px;font-weight:600">cable lat pulldown full range of motion</div><div style="font-size:12px;color:var(--color-neutral-400)">back · cable</div></div><div style="font-size:13px;font-weight:800;color:#3ecb8e;font-variant-numeric:tabular-nums">55 kg</div></div>
+          </div>
+
+          <div style="margin-top:18px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400);padding-bottom:8px;border-bottom:2px solid var(--color-neutral-600)">All movements · A</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:2px">
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-size:15px;font-weight:600">ab wheel rollout</div><div style="font-size:12px;color:var(--color-neutral-400)">core · wheel</div></div><i data-lucide="chevron-right" style="width:18px;height:18px;color:var(--color-neutral-400)"></i></div>
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-size:15px;font-weight:600">arnold press</div><div style="font-size:12px;color:var(--color-neutral-400)">shoulders · dumbbell</div></div><i data-lucide="chevron-right" style="width:18px;height:18px;color:var(--color-neutral-400)"></i></div>
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-size:15px;font-weight:600">assisted pull up</div><div style="font-size:12px;color:var(--color-neutral-400)">back · machine</div></div><i data-lucide="chevron-right" style="width:18px;height:18px;color:var(--color-neutral-400)"></i></div>
+          </div>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;background:var(--color-text);border-top:2px solid var(--color-neutral-600);display:grid;grid-template-columns:repeat(5,1fr)">
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-400)"><i data-lucide="house" style="width:20px;height:20px"></i><span>Home</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-400)"><i data-lucide="calendar-days" style="width:20px;height:20px"></i><span>Plan</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800"><i data-lucide="play" style="width:20px;height:20px"></i><span>Start</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-400)"><i data-lucide="trending-up" style="width:20px;height:20px"></i><span>Stats</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:#3ecb8e;border-top:4px solid #10a86a;margin-top:-2px"><i data-lucide="list" style="width:20px;height:20px"></i><span>Exercises</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BODY WEIGHT -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Body weight + goal</div>
+      <div data-screen-label="2a Body weight" style="width:390px;height:844px;overflow:hidden;position:relative;background:var(--color-text);color:var(--color-bg)">
+        <div style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)"><i data-lucide="chevron-left" style="width:18px;height:18px"></i><span>Home</span></div><div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:#3ecb8e">Edit goal</div></div>
+          <div style="height:2px;background:var(--color-neutral-600);margin:12px 0 18px"></div>
+          <div style="font-size:36px;font-weight:800;line-height:1;letter-spacing:-.025em">Body weight</div>
+          <div style="font-size:15px;color:var(--color-neutral-400);margin-top:4px">Asked before every workout · stored on device</div>
+
+          <div style="display:flex;gap:2px;margin-top:18px">
+            <div style="flex:1;background:var(--color-neutral-900);padding:16px"><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-400);font-weight:700">Latest</div><div style="font-size:34px;font-weight:800;line-height:1.05">74.2<span style="font-size:15px;color:var(--color-neutral-400)"> kg</span></div></div>
+            <div style="flex:1;background:var(--color-neutral-900);padding:16px"><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-400);font-weight:700">Goal</div><div style="font-size:34px;font-weight:800;line-height:1.05;color:#3ecb8e">70.0<span style="font-size:15px"> kg</span></div></div>
+          </div>
+
+          <div style="background:var(--color-neutral-900);padding:16px;margin-top:2px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400)">Trend · 8 weeks</div><div style="font-size:13px;color:#3ecb8e;font-weight:800">−1.8 kg</div></div>
+            <div style="position:relative;height:130px;margin-top:14px">
+              <div style="position:absolute;left:0;right:0;bottom:22%;height:2px;background:#0a6b43"></div>
+              <div style="position:absolute;left:0;bottom:22%;transform:translateY(-100%);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#3ecb8e;font-weight:800">Goal 70.0</div>
+              <div style="position:absolute;inset:0;display:flex;align-items:flex-end;gap:5px">
+                <div style="flex:1;height:96%;background:var(--color-neutral-600)"></div>
+                <div style="flex:1;height:92%;background:var(--color-neutral-600)"></div>
+                <div style="flex:1;height:94%;background:var(--color-neutral-600)"></div>
+                <div style="flex:1;height:88%;background:var(--color-neutral-600)"></div>
+                <div style="flex:1;height:85%;background:var(--color-neutral-600)"></div>
+                <div style="flex:1;height:83%;background:var(--color-neutral-600)"></div>
+                <div style="flex:1;height:80%;background:var(--color-neutral-600)"></div>
+                <div style="flex:1;height:78%;background:#10a86a"></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:20px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400);padding-bottom:8px;border-bottom:2px solid var(--color-neutral-600)">Entries</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:2px">
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;font-size:15px;font-variant-numeric:tabular-nums"><div>Mon 14 Sep</div><div style="font-weight:800">74.2 kg</div></div>
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;font-size:15px;font-variant-numeric:tabular-nums"><div>Fri 11 Sep</div><div style="font-weight:800">74.6 kg</div></div>
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;font-size:15px;font-variant-numeric:tabular-nums"><div>Mon 7 Sep</div><div style="font-weight:800">75.1 kg</div></div>
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;font-size:15px;font-variant-numeric:tabular-nums"><div>Thu 3 Sep</div><div style="font-weight:800">75.4 kg</div></div>
+          </div>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;padding:0 20px 20px"><div style="background:#0a6b43;color:#fff;font-weight:800;font-size:17px;padding:18px;min-height:60px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between"><span>Log today's weight</span><i data-lucide="plus" style="width:20px;height:20px"></i></div></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Settings &amp; privacy · appearance choice</div>
+      <div data-screen-label="2a Settings" style="width:390px;height:844px;overflow:hidden;position:relative;background:var(--color-text);color:var(--color-bg)">
+        <div style="padding:20px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)"><i data-lucide="chevron-left" style="width:18px;height:18px"></i><span>Home</span></div>
+          <div style="height:2px;background:var(--color-neutral-600);margin:12px 0 18px"></div>
+          <div style="font-size:36px;font-weight:800;line-height:1;letter-spacing:-.025em">Settings</div>
+          <div style="font-size:15px;color:var(--color-neutral-400);margin-top:4px">test_1 · client account</div>
+
+          <div style="margin-top:20px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400);padding-bottom:8px;border-bottom:2px solid var(--color-neutral-600)">Appearance</div>
+          <div style="display:flex;gap:2px;margin-top:2px">
+            <div style="flex:1;background:var(--color-bg);color:var(--color-text);padding:14px;display:flex;flex-direction:column;gap:6px"><i data-lucide="moon" style="width:18px;height:18px"></i><div style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase">Ink</div></div>
+            <div style="flex:1;background:var(--color-neutral-900);padding:14px;display:flex;flex-direction:column;gap:6px;color:var(--color-neutral-300)"><i data-lucide="sun" style="width:18px;height:18px"></i><div style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase">Paper</div></div>
+            <div style="flex:1;background:var(--color-neutral-900);padding:14px;display:flex;flex-direction:column;gap:6px;color:var(--color-neutral-300)"><i data-lucide="smartphone" style="width:18px;height:18px"></i><div style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase">System</div></div>
+          </div>
+          <div style="font-size:13px;color:var(--color-neutral-400);margin-top:8px">Active workouts always use the ink ground for legibility in the gym.</div>
+
+          <div style="margin-top:20px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400);padding-bottom:8px;border-bottom:2px solid var(--color-neutral-600)">Privacy</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:2px">
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px"><div><div style="font-size:15px;font-weight:700">Data stays on device</div><div style="font-size:13px;color:var(--color-neutral-400)">Logs never leave this phone unless you share</div></div><div style="width:52px;height:30px;background:#0a6b43;display:flex;align-items:center;justify-content:flex-end;padding:3px;box-sizing:border-box"><div style="width:24px;height:24px;background:#fff"></div></div></div>
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px"><div><div style="font-size:15px;font-weight:700">Share summaries with coach</div><div style="font-size:13px;color:var(--color-neutral-400)">Sets, reps and adherence · no body weight</div></div><div style="width:52px;height:30px;background:#0a6b43;display:flex;align-items:center;justify-content:flex-end;padding:3px;box-sizing:border-box"><div style="width:24px;height:24px;background:#fff"></div></div></div>
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px"><div><div style="font-size:15px;font-weight:700">Share body weight</div><div style="font-size:13px;color:var(--color-neutral-400)">Off · your coach sees trend only if enabled</div></div><div style="width:52px;height:30px;background:var(--color-neutral-600);display:flex;align-items:center;padding:3px;box-sizing:border-box"><div style="width:24px;height:24px;background:var(--color-neutral-300)"></div></div></div>
+          </div>
+          <div style="font-size:13px;color:var(--color-neutral-400);margin-top:6px">Analytics are off and cannot be enabled — nothing is collected.</div>
+
+          <div style="margin-top:20px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400);padding-bottom:8px;border-bottom:2px solid var(--color-neutral-600)">Account</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:2px">
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:10px"><i data-lucide="key-round" style="width:18px;height:18px;color:#3ecb8e"></i><span style="font-size:15px;font-weight:700">Passkey · this device</span></div><i data-lucide="chevron-right" style="width:18px;height:18px;color:var(--color-neutral-400)"></i></div>
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:10px"><i data-lucide="download" style="width:18px;height:18px"></i><span style="font-size:15px;font-weight:700">Export my data</span></div><i data-lucide="chevron-right" style="width:18px;height:18px;color:var(--color-neutral-400)"></i></div>
+            <div style="background:var(--color-neutral-900);padding:11px 14px;display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:10px"><i data-lucide="trash-2" style="width:18px;height:18px"></i><span style="font-size:15px;font-weight:700">Delete everything</span></div><i data-lucide="chevron-right" style="width:18px;height:18px;color:var(--color-neutral-400)"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ROW 3: coach view, login, light mode ===== -->
+  <div style="display:flex;gap:28px;flex-wrap:wrap">
+
+    <!-- COACH VIEW -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Coach view of a client</div>
+      <div data-screen-label="2a Coach view" style="width:390px;height:844px;overflow:hidden;position:relative;background:var(--color-text);color:var(--color-bg)">
+        <div style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)"><div style="display:flex;align-items:center;gap:8px"><i data-lucide="chevron-left" style="width:18px;height:18px"></i><span>Clients</span></div><div style="color:#3ecb8e">Trainer mode</div></div>
+          <div style="height:2px;background:var(--color-neutral-600);margin:12px 0 18px"></div>
+          <div style="font-size:36px;font-weight:800;line-height:1;letter-spacing:-.025em">test_1</div>
+          <div style="font-size:15px;color:var(--color-neutral-400);margin-top:4px">Starter PPL · assigned 4 weeks ago</div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:18px">
+            <div style="background:var(--color-neutral-900);padding:14px"><div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-400)">Adherence</div><div style="font-size:28px;font-weight:800;line-height:1.1;color:#3ecb8e">78%</div></div>
+            <div style="background:var(--color-neutral-900);padding:14px"><div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-400)">Streak</div><div style="font-size:28px;font-weight:800;line-height:1.1">1</div></div>
+            <div style="background:var(--color-neutral-900);padding:14px"><div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-400)">Last seen</div><div style="font-size:28px;font-weight:800;line-height:1.1">2d</div></div>
+          </div>
+
+          <div style="margin-top:18px;background:#0a6b43;color:#fff;padding:16px">
+            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:800">You control this client's schedule</div>
+            <div style="font-size:14px;margin-top:6px;opacity:.94">Assign days, set days off, and edit the plan. The client sees it read-only.</div>
+            <div style="display:flex;gap:2px;margin-top:14px">
+              <div style="flex:1;background:#fff;color:#0a6b43;font-weight:800;font-size:14px;padding:13px;min-height:46px;box-sizing:border-box;display:flex;align-items:center">Edit plan</div>
+              <div style="flex:1;border:2px solid #fff;font-weight:800;font-size:14px;padding:13px;min-height:46px;box-sizing:border-box;display:flex;align-items:center">Set day off</div>
+            </div>
+          </div>
+
+          <div style="margin-top:20px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400);padding-bottom:8px;border-bottom:2px solid var(--color-neutral-600)">This week</div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:2px">
+            <div style="background:var(--color-bg);color:var(--color-text);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;font-weight:700">MO</div><div style="font-size:17px;font-weight:800">14</div><div style="font-size:9px;font-weight:800;color:#0a6b43">OFF</div></div>
+            <div style="background:var(--color-neutral-900);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;color:var(--color-neutral-400)">TU</div><div style="font-size:17px;font-weight:700">15</div><div style="font-size:9px;color:var(--color-neutral-500)">—</div></div>
+            <div style="background:var(--color-neutral-900);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;color:var(--color-neutral-400)">WE</div><div style="font-size:17px;font-weight:700">16</div><div style="font-size:9px;font-weight:800;color:#3ecb8e">PULL</div></div>
+            <div style="background:var(--color-neutral-900);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;color:var(--color-neutral-400)">TH</div><div style="font-size:17px;font-weight:700">17</div><div style="font-size:9px;color:var(--color-neutral-500)">—</div></div>
+            <div style="background:var(--color-neutral-900);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;color:var(--color-neutral-400)">FR</div><div style="font-size:17px;font-weight:700">18</div><div style="font-size:9px;font-weight:800;color:#3ecb8e">OFF</div></div>
+            <div style="background:var(--color-neutral-900);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;color:var(--color-neutral-400)">SA</div><div style="font-size:17px;font-weight:700">19</div><div style="font-size:9px;color:var(--color-neutral-500)">—</div></div>
+            <div style="background:var(--color-neutral-900);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;color:var(--color-neutral-400)">SU</div><div style="font-size:17px;font-weight:700">20</div><div style="font-size:9px;color:var(--color-neutral-500)">—</div></div>
+          </div>
+
+          <div style="margin-top:20px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400);padding-bottom:8px;border-bottom:2px solid var(--color-neutral-600)">Shared sessions</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:2px">
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:10px"><div><div style="font-size:14px;font-weight:700">Push Day</div><div style="font-size:12px;color:var(--color-neutral-400)">Fri 11 Sep · 58 min</div></div><div style="font-size:13px;font-weight:800;color:#3ecb8e">19/19 sets</div></div>
+            <div style="background:var(--color-neutral-900);padding:12px 14px;display:flex;justify-content:space-between;gap:10px"><div><div style="font-size:14px;font-weight:700">Pull Day</div><div style="font-size:12px;color:var(--color-neutral-400)">Wed 9 Sep · 51 min</div></div><div style="font-size:13px;font-weight:800;color:var(--color-neutral-300)">14/16 sets</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-neutral-400);margin-top:10px"><i data-lucide="eye-off" style="width:14px;height:14px"></i><span>Body weight hidden — this client has not shared it.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Login · passkey</div>
+      <div data-screen-label="2a Login" style="width:390px;height:844px;overflow:hidden;position:relative;background:var(--color-text);color:var(--color-bg);display:flex;flex-direction:column">
+        <div style="padding:20px">
+          <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)">transforma</div>
+        </div>
+        <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;justify-content:center">
+          <div style="font-size:44px;font-weight:800;line-height:.98;letter-spacing:-.03em">Train.<br>Nothing<br>leaves<br>the phone.</div>
+          <div style="font-size:15px;color:var(--color-neutral-300);margin-top:18px;max-width:34ch;text-wrap:pretty">Sign in with a passkey. No password, no email, no tracking. Your logs stay on this device; only what you choose reaches your coach.</div>
+        </div>
+        <div style="padding:20px">
+          <div style="background:#0a6b43;color:#fff;font-weight:800;font-size:17px;padding:18px;min-height:60px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between"><span>Continue with passkey</span><i data-lucide="fingerprint" style="width:22px;height:22px"></i></div>
+          <div style="border:2px solid var(--color-neutral-500);color:var(--color-bg);font-weight:800;font-size:15px;padding:16px;min-height:52px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;margin-top:2px"><span>Restore from backup file</span><i data-lucide="upload" style="width:18px;height:18px"></i></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-neutral-400);margin-top:14px"><i data-lucide="shield-check" style="width:16px;height:16px;color:#3ecb8e"></i><span>Invited by a trainer? Your code links the account after sign-in.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIGHT MODE PAIR -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Paper appearance · same direction</div>
+      <div data-screen-label="2a Home light" style="width:390px;height:844px;overflow:hidden;position:relative;background:var(--color-bg);color:var(--color-text)">
+        <div style="padding:20px 20px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-700)"><div>transforma</div><div style="display:flex;align-items:center;gap:6px;color:#0a6b43"><i data-lucide="shield-check" style="width:16px;height:16px"></i><span>On device</span></div></div>
+          <div style="height:2px;background:var(--color-text);margin:12px 0 18px"></div>
+          <div style="font-size:36px;font-weight:800;line-height:1;letter-spacing:-.025em">Hi test_1</div>
+          <div style="font-size:15px;color:var(--color-neutral-700);margin-top:4px">Monday 14 September</div>
+
+          <div style="margin-top:22px;background:#0a6b43;color:#fff;padding:18px 18px 20px">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:800"><i data-lucide="user-round-check" style="width:16px;height:16px"></i><span>Today · given by your trainer</span></div>
+            <div style="font-size:40px;font-weight:800;line-height:1;letter-spacing:-.03em;margin-top:10px">Day Off</div>
+            <div style="font-size:14px;margin-top:10px;opacity:.9">2026-09-14 · Asia/Calcutta</div>
+            <div style="margin-top:16px;background:#fff;color:#0a6b43;font-weight:800;font-size:15px;padding:14px;min-height:48px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between"><span>View coach schedule</span><i data-lucide="arrow-right" style="width:18px;height:18px"></i></div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:22px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-700)">
+            <div style="min-height:32px;display:flex;align-items:center;gap:4px"><i data-lucide="chevron-left" style="width:16px;height:16px"></i><span>Prev</span></div>
+            <div style="color:var(--color-text)">This week</div>
+            <div style="min-height:32px;display:flex;align-items:center;gap:4px"><span>Next</span><i data-lucide="chevron-right" style="width:16px;height:16px"></i></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:10px">
+            <div style="background:var(--color-text);color:var(--color-bg);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;font-weight:700">MO</div><div style="font-size:18px;font-weight:800">14</div><div style="font-size:9px;letter-spacing:.06em;font-weight:800;color:#3ecb8e">OFF</div></div>
+            <div style="background:var(--color-surface);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;color:var(--color-neutral-700)">TU</div><div style="font-size:18px;font-weight:700">15</div><div style="font-size:9px;color:var(--color-neutral-600)">—</div></div>
+            <div style="background:var(--color-surface);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;color:var(--color-neutral-700)">WE</div><div style="font-size:18px;font-weight:700">16</div><div style="font-size:9px;letter-spacing:.06em;font-weight:800;color:#0a6b43">PULL</div></div>
+            <div style="background:var(--color-surface);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;color:var(--color-neutral-700)">TH</div><div style="font-size:18px;font-weight:700">17</div><div style="font-size:9px;color:var(--color-neutral-600)">—</div></div>
+            <div style="background:var(--color-surface);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;color:var(--color-neutral-700)">FR</div><div style="font-size:18px;font-weight:700">18</div><div style="font-size:9px;letter-spacing:.06em;font-weight:800;color:#0a6b43">OFF</div></div>
+            <div style="background:var(--color-surface);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;color:var(--color-neutral-700)">SA</div><div style="font-size:18px;font-weight:700">19</div><div style="font-size:9px;color:var(--color-neutral-600)">—</div></div>
+            <div style="background:var(--color-surface);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;letter-spacing:.08em;color:var(--color-neutral-700)">SU</div><div style="font-size:18px;font-weight:700">20</div><div style="font-size:9px;color:var(--color-neutral-600)">—</div></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:22px">
+            <div style="background:var(--color-surface);padding:16px"><div style="display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-700)"><i data-lucide="flame" style="width:14px;height:14px"></i><span>Week streak</span></div><div style="font-size:44px;font-weight:800;line-height:1;margin-top:6px">1</div><div style="font-size:13px;color:var(--color-neutral-800)">0 / 3 this week</div></div>
+            <div style="background:var(--color-surface);padding:16px"><div style="display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-700)"><i data-lucide="dumbbell" style="width:14px;height:14px"></i><span>Workouts</span></div><div style="font-size:44px;font-weight:800;line-height:1;margin-top:6px">1</div><div style="font-size:13px;color:var(--color-neutral-800)">total · view calendar</div></div>
+          </div>
+
+          <div style="background:var(--color-surface);padding:16px;margin-top:2px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div style="display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-700)"><i data-lucide="scale" style="width:14px;height:14px"></i><span>Body weight</span></div><div style="display:flex;gap:16px;font-size:14px;font-weight:800;color:#0a6b43"><div style="min-height:44px;display:flex;align-items:center">Goal</div><div style="min-height:44px;display:flex;align-items:center;gap:4px"><i data-lucide="plus" style="width:16px;height:16px"></i><span>Log</span></div></div></div>
+            <div style="font-size:14px;color:var(--color-neutral-800);text-wrap:pretty">No entries yet — log your weight to start the curve. It's also asked before every workout.</div>
+          </div>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;background:var(--color-bg);border-top:2px solid var(--color-text);display:grid;grid-template-columns:repeat(5,1fr)">
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:#0a6b43;border-top:4px solid #10a86a;margin-top:-2px"><i data-lucide="house" style="width:20px;height:20px"></i><span>Home</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-700)"><i data-lucide="calendar-days" style="width:20px;height:20px"></i><span>Plan</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800"><i data-lucide="play" style="width:20px;height:20px"></i><span>Start</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-700)"><i data-lucide="trending-up" style="width:20px;height:20px"></i><span>Stats</span></div>
+          <div style="padding:12px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--color-neutral-700)"><i data-lucide="list" style="width:20px;height:20px"></i><span>Exercises</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAY OFF -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Start · day-off state</div>
+      <div data-screen-label="2a Day off" style="width:390px;height:400px;overflow:hidden;background:var(--color-text);color:var(--color-bg);padding:20px;box-sizing:border-box">
+        <div style="font-size:34px;font-weight:800;letter-spacing:-.025em;line-height:1">Start workout</div>
+        <div style="font-size:15px;color:var(--color-neutral-400);margin-top:4px">Follow your coach-assigned schedule</div>
+        <div style="margin-top:18px;background:#0a6b43;color:#fff;padding:18px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:800"><i data-lucide="user-round-check" style="width:14px;height:14px"></i><span>Rest day · given by your trainer</span></div>
+          <div style="font-size:24px;font-weight:800;margin-top:8px;line-height:1.12;text-wrap:pretty">Your trainer has given you a day off today.</div>
+        </div>
+        <div style="display:flex;gap:2px;margin-top:2px">
+          <div style="flex:1;background:var(--color-bg);color:var(--color-text);font-weight:800;font-size:15px;padding:16px;min-height:52px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between"><span>View coach schedule</span><i data-lucide="arrow-right" style="width:18px;height:18px"></i></div>
+          <div style="background:var(--color-neutral-900);color:var(--color-bg);font-weight:800;font-size:15px;padding:16px;min-height:52px;box-sizing:border-box;display:flex;align-items:center">Log extra</div>
+        </div>
+        <div style="font-size:13px;color:var(--color-neutral-400);margin-top:14px">Extra sessions stay yours and are marked separately from coach-assigned work.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DESKTOP ===== -->
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Desktop 1440 × 900</div>
+    <div data-screen-label="2a Desktop" style="width:1440px;height:900px;overflow:hidden;display:flex;background:var(--color-text);color:var(--color-bg)">
+      <div style="width:232px;border-right:2px solid var(--color-neutral-600);padding:28px 24px;display:flex;flex-direction:column;gap:28px;box-sizing:border-box">
+        <div style="font-size:14px;letter-spacing:.14em;text-transform:uppercase;font-weight:800">transforma</div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="background:#0a6b43;color:#fff;padding:12px 14px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:10px"><i data-lucide="house" style="width:18px;height:18px"></i><span>Home</span></div>
+          <div style="background:var(--color-neutral-900);padding:12px 14px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:10px"><i data-lucide="calendar-days" style="width:18px;height:18px"></i><span>Plan</span></div>
+          <div style="background:var(--color-neutral-900);padding:12px 14px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:10px"><i data-lucide="play" style="width:18px;height:18px"></i><span>Start</span></div>
+          <div style="background:var(--color-neutral-900);padding:12px 14px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:10px"><i data-lucide="trending-up" style="width:18px;height:18px"></i><span>Stats</span></div>
+          <div style="background:var(--color-neutral-900);padding:12px 14px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:10px"><i data-lucide="list" style="width:18px;height:18px"></i><span>Exercises</span></div>
+        </div>
+        <div style="margin-top:auto"><div style="font-size:13px;font-weight:800">test_1</div><div style="font-size:12px;color:var(--color-neutral-400)">Client account · passkey</div><div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:#3ecb8e;margin-top:8px"><i data-lucide="settings" style="width:16px;height:16px"></i><span>Settings</span></div></div>
+      </div>
+      <div style="flex:1;padding:28px 32px;display:flex;flex-direction:column;gap:20px;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--color-neutral-600);padding-bottom:14px">
+          <div><div style="font-size:40px;font-weight:800;letter-spacing:-.025em;line-height:1">Hi test_1</div><div style="font-size:15px;color:var(--color-neutral-400);margin-top:4px">Monday 14 September · Asia/Calcutta</div></div>
+          <div style="display:flex;align-items:center;gap:12px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-400)"><i data-lucide="chevron-left" style="width:16px;height:16px"></i><span>This week</span><i data-lucide="chevron-right" style="width:16px;height:16px"></i></div>
+        </div>
+        <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px;min-width:0;flex:1">
+          <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+            <div style="background:#0a6b43;color:#fff;padding:24px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px">
+              <div><div style="display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:800"><i data-lucide="user-round-check" style="width:16px;height:16px"></i><span>Today · given by your trainer</span></div><div style="font-size:52px;font-weight:800;line-height:1;letter-spacing:-.03em;margin-top:8px">Day Off</div><div style="font-size:14px;margin-top:8px;opacity:.9">2026-09-14 · Asia/Calcutta</div></div>
+              <div style="background:#fff;color:#0a6b43;font-weight:800;font-size:15px;padding:14px 16px;display:flex;align-items:center;gap:10px"><span>View coach schedule</span><i data-lucide="arrow-right" style="width:18px;height:18px"></i></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+              <div style="background:var(--color-bg);color:var(--color-text);padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:11px;font-weight:700;letter-spacing:.08em">MO</div><div style="font-size:22px;font-weight:800">14</div><div style="font-size:10px;font-weight:800;color:#0a6b43">OFF</div></div>
+              <div style="background:var(--color-neutral-900);padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:11px;letter-spacing:.08em;color:var(--color-neutral-400)">TU</div><div style="font-size:22px;font-weight:700">15</div><div style="font-size:10px;color:var(--color-neutral-500)">—</div></div>
+              <div style="background:var(--color-neutral-900);padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:11px;letter-spacing:.08em;color:var(--color-neutral-400)">WE</div><div style="font-size:22px;font-weight:700">16</div><div style="font-size:10px;font-weight:800;color:#3ecb8e">PULL</div></div>
+              <div style="background:var(--color-neutral-900);padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:11px;letter-spacing:.08em;color:var(--color-neutral-400)">TH</div><div style="font-size:22px;font-weight:700">17</div><div style="font-size:10px;color:var(--color-neutral-500)">—</div></div>
+              <div style="background:var(--color-neutral-900);padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:11px;letter-spacing:.08em;color:var(--color-neutral-400)">FR</div><div style="font-size:22px;font-weight:700">18</div><div style="font-size:10px;font-weight:800;color:#3ecb8e">OFF</div></div>
+              <div style="background:var(--color-neutral-900);padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:11px;letter-spacing:.08em;color:var(--color-neutral-400)">SA</div><div style="font-size:22px;font-weight:700">19</div><div style="font-size:10px;color:var(--color-neutral-500)">—</div></div>
+              <div style="background:var(--color-neutral-900);padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:11px;letter-spacing:.08em;color:var(--color-neutral-400)">SU</div><div style="font-size:22px;font-weight:700">20</div><div style="font-size:10px;color:var(--color-neutral-500)">—</div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px">
+              <div style="background:var(--color-neutral-900);padding:18px"><div style="display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-400);font-weight:700"><i data-lucide="flame" style="width:14px;height:14px"></i><span>Week streak</span></div><div style="font-size:44px;font-weight:800;line-height:1;margin-top:6px">1</div><div style="font-size:13px;color:var(--color-neutral-400)">0 / 3 this week</div></div>
+              <div style="background:var(--color-neutral-900);padding:18px"><div style="display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-400);font-weight:700"><i data-lucide="dumbbell" style="width:14px;height:14px"></i><span>Workouts</span></div><div style="font-size:44px;font-weight:800;line-height:1;margin-top:6px">1</div><div style="font-size:13px;color:var(--color-neutral-400)">View calendar</div></div>
+              <div style="background:var(--color-neutral-900);padding:18px"><div style="display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-400);font-weight:700"><i data-lucide="scale" style="width:14px;height:14px"></i><span>Body weight</span></div><div style="font-size:44px;font-weight:800;line-height:1;margin-top:6px">—</div><div style="font-size:13px;color:#3ecb8e;font-weight:800">Goal · + Log</div></div>
+            </div>
+            <div style="background:var(--color-neutral-900);padding:16px 18px;font-size:14px;color:var(--color-neutral-300)">No entries yet — log your weight to start the curve. It's also asked before every workout.</div>
+            <div style="background:var(--color-neutral-900);padding:18px;flex:1;display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--color-neutral-400)">Sessions per week</div><div style="font-size:13px;color:var(--color-neutral-300)">target 3</div></div>
+              <div style="display:flex;align-items:flex-end;gap:8px;flex:1;min-height:0">
+                <div style="flex:1;height:33%;background:var(--color-neutral-600)"></div>
+                <div style="flex:1;height:66%;background:var(--color-neutral-600)"></div>
+                <div style="flex:1;height:100%;background:#10a86a"></div>
+                <div style="flex:1;height:66%;background:var(--color-neutral-600)"></div>
+                <div style="flex:1;height:100%;background:#10a86a"></div>
+                <div style="flex:1;height:66%;background:var(--color-neutral-600)"></div>
+                <div style="flex:1;height:33%;background:var(--color-neutral-600)"></div>
+                <div style="flex:1;height:33%;background:var(--color-neutral-600)"></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+            <div style="background:var(--color-neutral-900);padding:18px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+              <div><div style="display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#3ecb8e"><i data-lucide="user-round-check" style="width:14px;height:14px"></i><span>Coach-assigned plan</span></div><div style="font-size:26px;font-weight:800;letter-spacing:-.02em">Starter PPL</div><div style="font-size:13px;color:var(--color-neutral-300);margin-top:4px">Your trainer manages this plan and its schedule.</div></div>
+              <div style="border:2px solid var(--color-neutral-500);padding:4px 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;white-space:nowrap;color:var(--color-neutral-300);display:flex;align-items:center;gap:4px"><i data-lucide="lock" style="width:12px;height:12px"></i><span>Read only</span></div>
+            </div>
+            <div style="padding:14px 0 8px;display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--color-bg)"><div style="font-size:17px;font-weight:800">Push Day</div><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-400)">Monday</div></div>
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <div style="background:var(--color-neutral-900);padding:10px 14px;display:flex;justify-content:space-between;gap:12px"><div style="font-size:14px;font-weight:600">barbell bench press</div><div style="font-size:13px;font-weight:800;font-variant-numeric:tabular-nums">4×8</div></div>
+              <div style="background:var(--color-neutral-900);padding:10px 14px;display:flex;justify-content:space-between;gap:12px"><div style="font-size:14px;font-weight:600">barbell incline bench press</div><div style="font-size:13px;font-weight:800;font-variant-numeric:tabular-nums">3×10</div></div>
+              <div style="background:var(--color-neutral-900);padding:10px 14px;display:flex;justify-content:space-between;gap:12px"><div style="font-size:14px;font-weight:600">dumbbell standing overhead press</div><div style="font-size:13px;font-weight:800;font-variant-numeric:tabular-nums">3×10</div></div>
+              <div style="background:var(--color-neutral-900);padding:10px 14px;display:flex;justify-content:space-between;gap:12px"><div style="font-size:14px;font-weight:600">dumbbell lateral raise</div><div style="font-size:13px;font-weight:800;font-variant-numeric:tabular-nums">3×12</div></div>
+              <div style="background:var(--color-neutral-900);padding:10px 14px;display:flex;justify-content:space-between;gap:12px"><div style="font-size:14px;font-weight:600">cable triceps pushdown (v-bar)</div><div style="font-size:13px;font-weight:800;font-variant-numeric:tabular-nums">3×12</div></div>
+              <div style="background:var(--color-neutral-900);padding:10px 14px;display:flex;justify-content:space-between;gap:12px"><div style="font-size:14px;font-weight:600">chest dip</div><div style="font-size:13px;font-weight:800;font-variant-numeric:tabular-nums">3×10</div></div>
+            </div>
+            <div style="padding:14px 0 8px;display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--color-bg)"><div style="font-size:17px;font-weight:800">Pull Day</div><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-400)">Wednesday</div></div>
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <div style="background:var(--color-neutral-900);padding:10px 14px;display:flex;justify-content:space-between;gap:12px"><div style="font-size:14px;font-weight:600">cable lat pulldown full range of motion</div><div style="font-size:13px;font-weight:800;font-variant-numeric:tabular-nums">4×10</div></div>
+              <div style="background:var(--color-neutral-900);padding:10px 14px;display:flex;justify-content:space-between;gap:12px"><div style="font-size:14px;font-weight:600">barbell bent over row</div><div style="font-size:13px;font-weight:800;font-variant-numeric:tabular-nums">4×8</div></div>
+              <div style="background:var(--color-neutral-900);padding:10px 14px;display:flex;justify-content:space-between;gap:12px"><div style="font-size:14px;font-weight:600">cable rope seated row</div><div style="font-size:13px;font-weight:800;font-variant-numeric:tabular-nums">3×10</div></div>
+              <div style="background:var(--color-neutral-900);padding:10px 14px;display:flex;justify-content:space-between;gap:12px"><div style="font-size:14px;font-weight:600">barbell curl</div><div style="font-size:13px;font-weight:800;font-variant-numeric:tabular-nums">3×10</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1100px;border-top:2px solid var(--color-text);padding-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:28px;font-size:14px;color:var(--color-neutral-900)">
+    <div><div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;margin-bottom:6px">Accent</div><div>Fills #0a6b43 with white type. #3ecb8e for accent text on ink, #0a6b43 for accent text on paper, #10a86a for data marks only.</div></div>
+    <div><div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;margin-bottom:6px">Structure</div><div>2px rules, zero radius, 2px gaps between tiles. Neutral-900 is the only card fill on ink; surface is the only one on paper.</div></div>
+    <div><div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;margin-bottom:6px">Type</div><div>Archivo throughout. 36px screen titles, 15px body, 11px uppercase labels at .12em, tabular numerals for all logged values.</div></div>
+    <div><div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;margin-bottom:6px">Coach rules</div><div>Plans and schedules are trainer-authored and read-only to the client, days off are attributed and dated, extra sessions log separately, and the coach sees only what the client shared.</div></div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  drawIcons() { if (window.lucide) window.lucide.createIcons(); }
+  componentDidMount() { this.drawIcons(); setTimeout(() => this.drawIcons(), 400); setTimeout(() => this.drawIcons(), 1500); }
+  componentDidUpdate() { this.drawIcons(); }
+  renderVals() {
+    return {
+      showDesktop: this.props.showDesktop ?? true,
+      showNotes: this.props.showNotes ?? true,
+    };
+  }
+}
+</script>
+</body>
+</html>

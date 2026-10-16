@@ -6,6 +6,7 @@ import { DEMO, DEMO_SEEDED } from '../lib/demo.js'
 import { MOBILE, nativeLoad, nativeSave, syncReminder } from '../lib/mobile.js'
 
 const KEY = 'gym_state_v1'
+const OWNER = 'gym_state_owner'
 export const DEF = {
   unit: 'kg', restSec: 90, sound: true, keepAwake: true, lang: 'en',
   theme: 'dark', accent: 'lime', body: 'male', targetW: null,
@@ -36,6 +37,8 @@ const hasData = st => !!((st.workouts || []).length || (st.routines || []).lengt
 export const useStore = create((set, get) => {
   let pushTm = null
   let saveTm = null
+  let userGeneration = 0
+  const currentUser = (id, generation) => get().user?.id === id && userGeneration === generation
 
   // Mobile build: mirror the state into a file in the app's data directory (survives WebView
   // storage eviction) and keep the native reminder schedule in step with the weekly plan.
@@ -48,6 +51,7 @@ export const useStore = create((set, get) => {
     S._ts = Date.now()
     registerCustom(S.customEx)
     localStorage.setItem(KEY, JSON.stringify(S))
+    if (get().user) localStorage.setItem(OWNER, get().user.id)
     set({ S })
     if (MOBILE) nativePersist()
     if (push && get().user) {
@@ -80,6 +84,7 @@ export const useStore = create((set, get) => {
     localStorage.removeItem('gym_guest')
     localStorage.removeItem('gym_dirty')
     localStorage.removeItem(KEY)
+    localStorage.removeItem(OWNER)
     persist(clone(DEF), false)
   }
 
@@ -104,29 +109,56 @@ export const useStore = create((set, get) => {
     setGuest(v) { if (v) localStorage.setItem('gym_guest', '1'); else localStorage.removeItem('gym_guest'); set({}) },
 
     setUser(u) {
+      const previousId = get().user?.id || localStorage.getItem(OWNER)
+      const nextId = u?.id || null
+      if (get().user?.id !== nextId) userGeneration += 1
+      // Only unowned guest data can migrate into a newly created profile.
+      if (previousId && previousId !== nextId) {
+        clearTimeout(pushTm)
+        clearTimeout(saveTm)
+        pushTm = saveTm = null
+        localStorage.removeItem('gym_dirty')
+        localStorage.removeItem(KEY)
+        localStorage.removeItem(OWNER)
+        registerCustom([])
+        set({ S: clone(DEF) })
+      }
       if (u) { localStorage.setItem('gym_user', JSON.stringify(u)); localStorage.removeItem('gym_guest') }
       else localStorage.removeItem('gym_user')
+      if (u) localStorage.setItem(OWNER, u.id)
       set({ user: u })
     },
 
     async pushState() {
       if (!get().user) return
+      const userId = get().user.id, generation = userGeneration
       clearTimeout(pushTm)
-      try { await api('/api/data', { method: 'PUT', body: JSON.stringify({ state: get().S }) }); localStorage.removeItem('gym_dirty') }
-      catch (e) { localStorage.setItem('gym_dirty', '1') }
+      try {
+        await api('/api/data', { method: 'PUT', body: JSON.stringify({ state: get().S }) })
+        if (currentUser(userId, generation)) localStorage.removeItem('gym_dirty')
+      } catch (e) {
+        if (!currentUser(userId, generation)) return
+        if (e.status === 401) clearLocalSession()
+        else localStorage.setItem('gym_dirty', '1')
+      }
     },
     async pullState() {
+      if (!get().user) return
+      const userId = get().user.id, generation = userGeneration
       try {
         const { state } = await api('/api/data')
+        if (!currentUser(userId, generation)) return
         const S = get().S
         const dirty = localStorage.getItem('gym_dirty') === '1'
-        if (state && (!hasData(S) || ((state._ts || 0) >= (S._ts || 0) && !dirty))) {
+        if (state && !dirty && (!hasData(S) || (state._ts || 0) >= (S._ts || 0))) {
           const active = S.active
           const next = Object.assign(clone(DEF), state)
           if (active) next.active = active
           persist(next, false)
-        } else if (hasData(S)) { await get().pushState() }
-      } catch (e) { /* offline — keep local */ }
+        } else if (dirty || hasData(S)) { await get().pushState() }
+      } catch (e) {
+        if (e.status === 401 && currentUser(userId, generation)) clearLocalSession()
+      }
     },
 
     async signOut() {
@@ -155,6 +187,7 @@ export const useStore = create((set, get) => {
 
     // Boot: ask the server who we are, then pull.
     async boot() {
+      const generation = userGeneration
       // Mobile build: no backend either — restore from the file mirror (the durable copy;
       // localStorage may have been evicted since the last run) and go straight in.
       if (MOBILE) {
@@ -183,7 +216,9 @@ export const useStore = create((set, get) => {
       // Instance capabilities are public and needed whether or not anyone is signed in.
       try { set({ config: await api('/api/config') }) } catch (e) { /* offline — assume nothing extra */ }
       try {
+        if (generation !== userGeneration) return
         const me = await api('/api/me')
+        if (generation !== userGeneration) return
         get().setUser(me.user)
         await get().pullState()
         // Re-stamp the reminder's timezone on every load — keeps it correct if you're travelling,
@@ -193,7 +228,10 @@ export const useStore = create((set, get) => {
           get().update(s => { s.reminder = { ...s.reminder, tz } })
         }
       } catch (e) {
-        if (e.status === 401) get().setUser(null)
+        if (e.status === 401 && generation === userGeneration) {
+          if (get().user || localStorage.getItem(OWNER)) clearLocalSession()
+          else get().setUser(null)
+        }
       }
       set({ ready: true })
     }

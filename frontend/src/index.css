@@ -302,6 +302,11 @@ h4.sec{
 
 .blocklist{display:flex;flex-direction:column;gap:2px}
 .blocklist>*{background:var(--surface);padding:12px 14px}
+.exercise-list .row{min-height:74px;text-align:left}
+.exercise-list .exercise-copy{flex:1;min-width:0}
+.exercise-list .tt{font-size:16px;font-weight:600;line-height:1.25;letter-spacing:-.015em}
+.exercise-list .ss{margin-top:3px;color:var(--label-2);font-size:13px;line-height:1.3;letter-spacing:0}
+.exercise-list .btn,.exercise-list .tag{flex:none}
 
 /* trainer-authored content: a full-bleed fill, not a bordered card, per
    research.md §1a — reserved for the primary action and anything the
@@ -1080,7 +1085,6 @@ h4.sec{
     border:var(--hair) solid var(--sep-op);border-radius:var(--r-xl);
     padding:7px 10px 9px;box-shadow:0 12px 40px -10px rgba(0,0,0,.5);
   }
-  #tabbar button.start{margin-top:-26px}
   .sheet{left:50%;right:auto;margin-left:-320px;width:640px;border-radius:var(--r-xl) var(--r-xl) 0 0}
   .center{width:340px}
   #timer{left:50%;right:auto;margin-left:-260px;width:520px;bottom:112px}

@@ -11,6 +11,7 @@ import { DEMO } from '../lib/demo.js'
 import { MOBILE } from '../lib/mobile.js'
 import { useCoachingStore } from '../store/useCoachingStore.js'
 import { hasActiveCoachPlan, ownAssignmentSchedule } from '../lib/coaching/schedule.js'
+import { assignedTargetLabel } from '../lib/coaching/logger.js'
 
 export default function Plan() {
   const nav = useNavigate()
@@ -72,7 +73,7 @@ export default function Plan() {
 }
 
 function CoachAssignedPlan({ workspace, assigned }) {
-  const plan = workspace.workout.content
+  const plan = workspace.workout?.content || { name: 'One-time workouts', days: [] }
   return <>
     {/* Trainer-authored content carries the dedicated trainer-authority eyebrow
         colour, not the client's personal accent — the signal must read the same
@@ -87,6 +88,7 @@ function CoachAssignedPlan({ workspace, assigned }) {
         </div>
         <StatusBadge status="read-only" label={t('Read only')} />
       </div>
+      {workspace.cachedAt && <p className="small dim">{t('Last refreshed')}: {new Date(workspace.cachedAt).toLocaleString()}</p>}
     </div>
 
     <h4 className="eyebrow" style={{ margin: '22px 0 2px' }}>{t('Training plan')}</h4>
@@ -108,7 +110,10 @@ function CoachAssignedPlan({ workspace, assigned }) {
             {exercise.name}
             {exercise.notes && <div style={{ fontSize: 13, color: 'var(--label-2)', marginTop: 2, fontWeight: 400 }}>{exercise.notes}</div>}
           </div>
-          <div style={{ fontSize: 14, fontWeight: 800, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{coachExerciseLine(exercise, plan.unit)}</div>
+          <div style={{ fontSize: 14, fontWeight: 700, fontVariantNumeric: 'tabular-nums', textAlign: 'right', flexShrink: 0 }}>
+            {exercise.sets.map((set, index) => <div key={index}>{t('Set')} {index + 1}: {assignedTargetLabel(exercise, set, plan.unit)}</div>)}
+            <div className="small dim">{exercise.restSec || 0}s {t('rest')}</div>
+          </div>
         </div>)}</div>
         <div className="row between" style={{ gap: 12, fontSize: 12, color: 'var(--label-3)', marginTop: 6 }}>
           <span>{restNote}</span>
@@ -144,15 +149,6 @@ function CoachAssignedPlan({ workspace, assigned }) {
 
 function coachWeekday(value) {
   return t(DAYN[Number(value) % 7])
-}
-
-function coachExerciseLine(exercise, planUnit) {
-  const first = exercise.sets?.[0] || {}
-  const count = exercise.sets?.length || 0
-  const unit = exercise.unit || planUnit
-  if (exercise.mode === 'cardio') return `${count} ${t(count === 1 ? 'set' : 'sets')} · ${first.minutes || 0} min${first.speed ? ` · ${first.speed} km/h` : ''}`
-  if (exercise.mode === 'time') return `${count} ${t(count === 1 ? 'set' : 'sets')} · ${first.seconds || 0}s${first.weight ? ` · ${first.weight} ${unit}` : ''} · ${exercise.restSec || 0}s ${t('rest')}`
-  return `${count} ${t(count === 1 ? 'set' : 'sets')} · ${first.reps || 0} ${t('reps')}${first.weight ? ` · ${first.weight} ${unit}` : ''} · ${exercise.restSec || 0}s ${t('rest')}`
 }
 
 function fmtCoachDate(value) {

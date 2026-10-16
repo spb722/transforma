@@ -1,0 +1,28 @@
+.session-report-list { display: grid; gap: 12px; }
+.session-report { border: 1px solid var(--sep); border-radius: 14px; overflow: hidden; }
+.session-report summary { cursor: pointer; min-height: 72px; padding: 16px; display: flex; align-items: center; gap: 12px; list-style: none; }
+.session-report summary::-webkit-details-marker { display: none; }
+.session-report summary:focus-visible { outline: 2px solid var(--acc); outline-offset: -3px; }
+.session-report summary > span:first-child { min-width: 0; flex: 1; }
+.session-report summary strong, .session-report summary small { display: block; overflow-wrap: anywhere; }
+.session-report summary small { margin-top: 5px; color: var(--label-2); font-size: 12px; }
+.session-report-summary { text-align: right; font-size: 13px; }
+.session-report-expand { font-size: 22px; transition: transform .15s; }
+.session-report[open] .session-report-expand { transform: rotate(180deg); }
+.session-report-content { padding: 0 16px 16px; border-top: 1px solid var(--sep); }
+.session-report-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 18px 0; }
+.session-report-meta dt { color: var(--label-2); font-size: 12px; margin-bottom: 5px; }
+.session-report-meta dd { margin: 0; font-size: 13px; overflow-wrap: anywhere; }
+.session-report-notice { font-size: 13px; padding: 12px; background: var(--surface-2); border-radius: 10px; }
+.session-report-exercise { margin-top: 20px; }
+.session-report-exercise h3 { font-size: 15px; margin: 0 0 8px; overflow-wrap: anywhere; }
+.session-report-exercise h3 small { margin-left: 8px; color: var(--label-2); font-weight: 400; }
+.session-report-exercise p { font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.session-report-exercise table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px; }
+.session-report-exercise th, .session-report-exercise td { text-align: left; padding: 10px 6px; border-bottom: 1px solid var(--sep); overflow-wrap: anywhere; }
+.session-report-exercise th:first-child { width: 38px; }
+.session-report-exercise thead { color: var(--label-2); }
+.session-report-skipped { color: var(--label-2); font-style: italic; }
+@media (max-width: 480px) { .session-report summary { padding: 12px; gap: 8px; } .session-report-content { padding: 0 12px 12px; } .session-report-meta { grid-template-columns: 1fr; } }
+
+.session-report caption { text-align: left; color: var(--label-2); font-size: 12px; padding: 6px; }

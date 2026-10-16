@@ -64,6 +64,7 @@ function Shell() {
   const navigate = useNavigate()
   const loc = useLocation()
   const { S, user, ready } = useStore()
+  const coachingUserId = useCoachingStore(s => s.userId)
   const ownWorkspace = useCoachingStore(s => s.ownWorkspace)
   const coachPlanActive = hasActiveCoachPlan(ownWorkspace)
   const bindCoachingUser = useCoachingStore(s => s.bindUser)
@@ -76,7 +77,16 @@ function Shell() {
   // previously loaded screens usable offline; this only makes that state visible.
   const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine)
   useEffect(() => {
-    const goOnline = () => setOnline(true)
+    const goOnline = () => {
+      setOnline(true)
+      const userId = useStore.getState().user?.id
+      useCoachingStore.getState().syncAssignedResults().then(async () => {
+        if (!userId || useStore.getState().user?.id !== userId) return
+        // Refresh local History from the receipt after uploading offline changes.
+        await useStore.getState().pushState()
+        if (useStore.getState().user?.id === userId) await useStore.getState().pullState()
+      }).catch(() => {})
+    }
     const goOffline = () => setOnline(false)
     window.addEventListener('online', goOnline)
     window.addEventListener('offline', goOffline)
@@ -100,6 +110,9 @@ function Shell() {
 
   const authed = user || isGuest
   const joinRoute = loc.pathname.startsWith('/join/')
+  const coachingRoute = /^\/(studio|coaching)(\/|$)/.test(loc.pathname)
+  // Child requests need the account binding established by this shell's effect.
+  const coachingBindingPending = user && coachingRoute && coachingUserId !== user.id
   if (!ready && !authed) return (
     <div id="app">
       <div style={{ paddingTop: '44vh', display: 'flex', justifyContent: 'center', fontSize: 34, color: 'var(--label-3)' }}>
@@ -115,7 +128,9 @@ function Shell() {
       <div id="app" className="vfade" key={loc.pathname}>
         {!online && <OfflineBanner message="You're offline — showing what's already on this device. Actions that need the network will fail until you're back online." />}
         <ErrorBoundary>
-          {!authed && !joinRoute ? <Login /> : (
+          {!authed && !joinRoute ? <Login /> : coachingBindingPending ? (
+            <div role="status" aria-live="polite" style={{ padding: 24 }}>Loading coaching workspace…</div>
+          ) : (
             <Routes>
               <Route path="/join/:token" element={<Join />} />
               <Route path="/home" element={<Home />} />
